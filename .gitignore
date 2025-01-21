@@ -20,6 +20,9 @@
 .DS_Store
 *.pem
 
+ecosystem.config.js
+ecosystem.config.js.map
+
 # debug
 npm-debug.log*
 yarn-debug.log*
