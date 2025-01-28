@@ -51,9 +51,10 @@ export const AplicacionFields: Field[] = [
     label: 'Redirección',
     icon: <LinkOutlined />,
     validation: {
+      required: true,
       maxLength: 500,
-      pattern: /^(http|https):\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/\S*)?$/,
-      errorMessage: 'La redirección debe ser una URL válida y tener máximo 500 caracteres.',
+      pattern: /^\/[a-zA-Z0-9/-]*$/,
+      errorMessage: 'Debe iniciar con "/" y contener solo letras, números, guiones o barras.',
     },
   },
 ];
@@ -124,9 +125,9 @@ export const GrupoFields: Field[] = [
     icon: <EditOutlined />,
     validation: {
       required: true,
-      minLength: 3,
+      minLength: 2,
       maxLength: 15,
-      errorMessage: 'La clave debe tener entre 3 y 15 caracteres.',
+      errorMessage: 'La clave debe tener entre 2 y 15 caracteres.',
     },
   },
   {

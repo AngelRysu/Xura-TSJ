@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Panel Xura',
 };
 
-export default function PnaelLayout({ children }: { children: ReactNode }) {
+export default function PanelLayout({ children }: { children: ReactNode }) {
   return (
     <div>
       {children}
