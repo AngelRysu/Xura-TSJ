@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
-import WysiwygOutlinedIcon from '@mui/icons-material/WysiwygOutlined';
-import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined';
-import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+// import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
+// import WysiwygOutlinedIcon from '@mui/icons-material/WysiwygOutlined';
+// import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined';
+// import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+// import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -15,11 +15,11 @@ import { useAuthContext } from '@/app/context/AuthContext';
 
 const menuItems = [
   { icon: <HomeIcon />, label: 'Panel', link: '/panel' },
-  { icon: <AppsOutlinedIcon />, label: 'Aplicaciones', link: '/aplicaciones' },
-  { icon: <WysiwygOutlinedIcon />, label: 'Módulos', link: '/modulos' },
-  { icon: <ContactMailOutlinedIcon />, label: 'Credenciales', link: '/credenciales' },
-  { icon: <GroupsOutlinedIcon />, label: 'Grupos', link: '/grupos' },
-  { icon: <VpnKeyOutlinedIcon />, label: 'Roles', link: '/roles' },
+  // { icon: <AppsOutlinedIcon />, label: 'Aplicaciones', link: '/aplicaciones' },
+  // { icon: <WysiwygOutlinedIcon />, label: 'Módulos', link: '/modulos' },
+  // { icon: <GroupsOutlinedIcon />, label: 'Grupos', link: '/grupos' },
+  // { icon: <VpnKeyOutlinedIcon />, label: 'Roles', link: '/roles' },
+  // { icon: <ContactMailOutlinedIcon />, label: 'Credenciales', link: '/credenciales' },
   {
     icon: <LogoutIcon />,
     label: 'Salir',

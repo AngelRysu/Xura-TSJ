@@ -10,7 +10,7 @@ import { madaniArabicBold } from '@/public/assets/fonts';
 
 const fetchData = async (url: any) => {
   try {
-    const response = await fetch(`http://localhost:3001/api/${url}`);
+    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error(`Error fetching ${url}: ${response.statusText}`);
     }
@@ -26,7 +26,7 @@ const fetchData = async (url: any) => {
 
 const fetchString = async (url: any) => {
   try {
-    const response = await fetch(`http://localhost:3001/api/${url}`);
+    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error(`Error fetching ${url}: ${response.statusText}`);
     }

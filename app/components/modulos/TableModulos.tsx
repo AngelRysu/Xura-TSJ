@@ -143,6 +143,13 @@ export default function TableModulos() {
       flex: 2,
     },
     {
+      field: 'aplicacion',
+      headerName: 'Aplicación',
+      sortable: true,
+      filter: true,
+      flex: 1,
+    },
+    {
       field: 'estado',
       headerName: 'Estado',
       sortable: true,

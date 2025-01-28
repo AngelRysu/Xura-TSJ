@@ -3,6 +3,8 @@ interface TokenPayload {
   curp: string;
   correo: string;
   celular: string;
+  aplicaciones: string;
+  grupos: string;
   iat: number;
   exp: number;
   aud: string;
@@ -15,6 +17,8 @@ interface ParsedToken {
   curp: string;
   correo: string;
   celular: string;
+  aplicaciones: string;
+  grupos: string;
   token: string;
 }
 
@@ -47,7 +51,13 @@ export default function getToken(): ParsedToken | null {
   }
 
   const {
-    exp, idCredencial, curp, correo, celular,
+    exp,
+    idCredencial,
+    curp,
+    correo,
+    celular,
+    aplicaciones,
+    grupos,
   } = parsedJwt;
 
   // Verifica si el token ha expirado
@@ -61,6 +71,8 @@ export default function getToken(): ParsedToken | null {
     curp,
     correo,
     celular,
+    aplicaciones,
+    grupos,
     token: jwt,
   };
 
