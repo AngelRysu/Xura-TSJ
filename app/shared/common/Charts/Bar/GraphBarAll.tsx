@@ -126,14 +126,14 @@ export default function GraphBarAll({
           {title}
         </Typography>
         {description && (
-          <Typography variant='body2' sx={{ color: 'textSecondary' }}>
+          <Typography variant='body2'>
             {description}
           </Typography>
         )}
         <Box sx={{ position: 'relative', height: chartDimensions.height }}>
           <BarChart
             barLabel={(item) => {
-              const valor = (item.value || 0) - 4;
+              const valor = (item.value || 0);
               return valor.toString();
             }}
             xAxis={[
