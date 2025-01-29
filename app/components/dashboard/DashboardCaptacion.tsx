@@ -6,6 +6,9 @@ import { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
   Woman, Man, Groups2, Cast, AccountBalanceOutlined, CheckCircle, FlagCircle, PauseCircle,
+  AssignmentTurnedIn, Cancel,
+  MonetizationOn,
+  School
 } from '@mui/icons-material';
 import { GraphBarAll, LineChartPeriods, IndicatorCard } from '@/app/shared/common';
 // import { MapaJalisco } from '@/app/shared/common';
@@ -67,17 +70,22 @@ const getIcon = (type: string, category: string) => {
         : <AccountBalanceOutlined sx={{ color: '#54c98f', fontSize: '6rem' }} />;
     case 'estatus':
       switch (type) {
-        case 'EXAMEN PAGADO':
-          return <CheckCircle sx={{ color: '#308fff', fontSize: '3rem' }} />;
         case 'REGISTRADO SIN VALIDAR':
-          return <PauseCircle sx={{ color: '#ffae31', fontSize: '2rem' }} />;
+          return <Cancel sx={{ color: '#ff4d63', fontSize: '1.5rem' }} />; // Representa un estado inicial, es adecuado.
         case 'REGISTRADO VALIDADO':
-          return <FlagCircle sx={{ color: '#54c98f', fontSize: '2rem' }} />;
-        default:
-          return null;
+          return <CheckCircle sx={{ color: '#ffae31', fontSize: '1.5rem' }} />; // Validación completa: el check es muy claro.
+        case 'EXAMEN PAGADO':
+          return <MonetizationOn sx={{ color: '#54c98f', fontSize: '1.75rem' }} />; // Dinero pagado: el ícono de moneda es muy adecuado.
+        case 'PRESENTO EXAMEN':
+          return <AssignmentTurnedIn sx={{ color: '#54c98f', fontSize: '1.75rem' }} />; // "TurnedIn" representa una acción completada.
+        case 'INSCRIPCION PAGADA':
+          return <MonetizationOn sx={{ color: '#308fff', fontSize: '2rem' }} />; // Similar a "EXAMEN PAGADO", pero puedes cambiar el color para diferenciar.
+        case 'INSCRITO':
+          return <School sx={{ color: '#308fff', fontSize: '2rem' }} />; // Representa claramente que alguien ya está inscrito.
+        default: return <></>;
       }
     default:
-      return null;
+      return <></>;
   }
 };
 
@@ -94,10 +102,15 @@ const mapDataToItems = (
   icon: getIcon(item[category], category),
 }));
 
-function CaptacionTotalIndicator({ captacionTotal }: { captacionTotal: number }) {
+function CaptacionTotalIndicator({ captacionTotal, estatusData }: { captacionTotal: number, estatusData: EstatusData[] }) {
+  const registradosSinValidar = estatusData.find((data) => data.estatus === 'REGISTRADO SIN VALIDAR')?.cantidad || 0;
+  const registradosValidados = estatusData.find((data) => data.estatus === 'REGISTRADO VALIDADO')?.cantidad || 0;
+  const candidatosAvanzados = captacionTotal - registradosSinValidar - registradosValidados;
+  const porcentajeAvanzados = (candidatosAvanzados / captacionTotal) || 0;
   return (
     <IndicatorCard
-      title='Registros totales'
+      title="Registros totales"
+      description={new Intl.NumberFormat('es-MX').format(candidatosAvanzados) + ` - ${new Intl.NumberFormat('es-MX', { style: 'percent', maximumFractionDigits: 0 }).format(porcentajeAvanzados)} con exámen pagado`}
       value={new Intl.NumberFormat('es-MX').format(captacionTotal)}
       icon={<Groups2 sx={{ fontSize: '7rem', color: '#308fff' }} />}
       colors={{
@@ -129,11 +142,12 @@ function ModalidadIndicator({ modalidadData, captacionTotal }:
   );
 }
 
-function EstatusIndicator({ estatusData, lastFecha }:
-  { estatusData: EstatusData[]; lastFecha: string }) {
+function EstatusIndicator({ estatusData, captacionTotal }:
+  { estatusData: EstatusData[]; captacionTotal: number }) {
   return (
     <IndicatorCard
-      title='Estatus'
+      title="Estatus"
+      value={captacionTotal}
       items={mapDataToItems(estatusData, 'estatus')}
     />
   );
@@ -160,15 +174,18 @@ export default function DashboardCaptacion({ data }: DashboardPageProps) {
       }}
       >
         <Typography
-          variant='h4'
-          sx={{ whiteSpace: 'nowrap' }}
+          variant='h1'
+          sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
           className={madaniArabicBold.className}
         >
           Captación
           {' '}
           {data.periodo}
         </Typography>
-        <Typography variant='h5' sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}>
+        <Typography
+          variant='h5'
+          sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
+        >
           Última actualización
           {' '}
           {data.ultimaFecha}
@@ -180,10 +197,10 @@ export default function DashboardCaptacion({ data }: DashboardPageProps) {
         width: '100%',
       }}
       >
-        <CaptacionTotalIndicator captacionTotal={data.total} />
+        <CaptacionTotalIndicator captacionTotal={data.total} estatusData={data.estatusData} />
         <GeneroIndicator generoData={data.generoData} captacionTotal={data.total} />
         <ModalidadIndicator modalidadData={data.modalidadData} captacionTotal={data.total} />
-        <EstatusIndicator estatusData={data.estatusData} lastFecha={data.ultimaFecha} />
+        <EstatusIndicator estatusData={data.estatusData} captacionTotal={data.total} />
       </Box>
       <Box sx={{ padding: { xs: 1, xl: 1 }, alignItems: 'center', width: '100%' }}>
         <Box sx={{
