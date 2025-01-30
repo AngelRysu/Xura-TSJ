@@ -51,7 +51,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     setUser(null);
     localStorage.removeItem('authToken');
-    signOut(),
+    await signOut({ redirect: false });
     router.push('/');
   };
 

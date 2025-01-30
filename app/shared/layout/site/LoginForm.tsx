@@ -1,16 +1,17 @@
 import {
-  useState, Dispatch, SetStateAction, ChangeEvent,useEffect,
+  useState, Dispatch, SetStateAction, ChangeEvent, useEffect,
 } from 'react';
 import {
   Box, TextField, InputAdornment, IconButton, Button, Typography, Divider,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import Image from 'next/image';
-import { signIn, useSession} from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useAuthContext } from '@/app/context/AuthContext';
 import { madaniArabicRegular } from '@/public/assets/fonts';
 import SubmitNewLogin from './SubmitNewLogin';
-import { useRouter } from 'next/router'
+
 interface LoginPayload {
   curp?: string;
   celular?: string;
@@ -50,6 +51,7 @@ export default function LoginForm({
   onShowVerifyCode,
   onForgotPassword,
 }: LoginFormProps) {
+  const router = useRouter();
   const { setLoading } = useAuthContext();
   const [form, setForm] = useState({ account: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -118,10 +120,9 @@ export default function LoginForm({
   useEffect(() => {
     if (session?.accessToken) {
       localStorage.setItem('authToken', session.accessToken);
-      window.location.href = '/panel';
+      router.replace('/panel');
     }
-  }, [session]);
-  
+  }, [session, router]);
 
   return (
     <>
