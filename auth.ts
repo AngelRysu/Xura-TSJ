@@ -2,12 +2,15 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
 declare module 'next-auth' {
+  // eslint-disable-next-line no-unused-vars
   interface Session {
     accessToken?: string;
   }
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const {
+  handlers, signIn, signOut, auth,
+} = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -15,8 +18,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn ({ user }){
-      if (user){
+    async signIn({ user }) {
+      if (user) {
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/sesiones/google`, {
           method: 'POST',
           headers: {
@@ -25,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
           body: JSON.stringify({ correo: user.email }),
         });
-        if (response.ok){
+        if (response.ok) {
           return true;
         }
         return '/';
@@ -45,12 +48,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (response.ok) {
           const data = await response.json();
+          // eslint-disable-next-line no-param-reassign
           token.accessToken = data.token;
         }
       }
       return token;
     },
     async session({ session, token }) {
+      // eslint-disable-next-line no-param-reassign
       session.accessToken = token.accessToken as string;
       return session;
     },
