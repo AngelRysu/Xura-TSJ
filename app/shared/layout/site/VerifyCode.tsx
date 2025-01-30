@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import {
-  Box, Typography, Button, TextField, Link,
+  Box, Typography, Button, TextField,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { CardHome } from '@/app/shared/common/Cards';
@@ -76,7 +76,9 @@ export default function VerifyCode({
   };
 
   useEffect(() => {
-    if (type === 'Register' || (type === 'Auth' && !altSendUsed)) {
+    if (type === 'Register'
+      || (type === 'Auth' && !altSendUsed)
+      || (type === 'Forgot' && !altSendUsed)) {
       initiateVerification(messageMedium, destinatario);
     }
   }, [credencial, type, messageMedium, destinatario]);
@@ -348,11 +350,9 @@ export default function VerifyCode({
           }}
           onClick={handleAltSend}
         >
-          <Link color='inherit' underline='hover'>
-            {isEmailStep
-              ? '¿No recibió el código? Envíamelo al celular'
-              : '¿No recibió el código? Envíamelo al correo'}
-          </Link>
+          {isEmailStep
+            ? '¿No recibió el código? Envíamelo al celular'
+            : '¿No recibió el código? Envíamelo al correo'}
         </Typography>
       )}
       <Button

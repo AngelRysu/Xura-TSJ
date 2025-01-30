@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { CssBaseline } from '@mui/material';
 import AuthProvider from '@/app/context/AuthProvider';
+import PermissionsProvider from '@/app/context/PermissionsProvider';
 import { MainLay } from '@/app/shared/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '@/app/shared/themes/fontTheme';
@@ -19,12 +20,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <SessionProvider>
         <AuthProvider>
-          <CssBaseline />
-          <ThemeProvider theme={theme}>
-            <MainLay>
-              {children}
-            </MainLay>
-          </ThemeProvider>
+          <PermissionsProvider>
+            <CssBaseline />
+            <ThemeProvider theme={theme}>
+              <MainLay>
+                {children}
+              </MainLay>
+            </ThemeProvider>
+          </PermissionsProvider>
         </AuthProvider>
         </SessionProvider>
       </body>

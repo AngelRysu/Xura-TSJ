@@ -11,16 +11,34 @@ import { useRouter } from 'next/navigation';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import { usePermissions } from '@/app/context/PermissionsContext';
 
 const panelCards = [
-  { icon: <LockOutlinedIcon fontSize='large' />, title: 'SSO', link: '/inicio' },
-  { icon: <AssessmentOutlinedIcon fontSize='large' />, title: 'Indicadores', link: '/indicadores' },
-  { icon: <SchoolOutlinedIcon fontSize='large' />, title: 'Edcore', link: '/edcore' },
+  {
+    id: '1',
+    icon: <LockOutlinedIcon fontSize='large' />,
+    title: 'SSO',
+    link: '/inicio',
+  },
+  {
+    id: '3',
+    icon: <AssessmentOutlinedIcon fontSize='large' />,
+    title: 'Indicadores',
+    link: '/data',
+  },
+  {
+    id: '4',
+    icon: <SchoolOutlinedIcon fontSize='large' />,
+    title: 'Edcore',
+    link: 'https://edcore.tecmm.mx/',
+  },
 ];
 
 export default function PanelCard() {
   const router = useRouter();
-  const accessibleCards = panelCards;
+  const { hasApplicationAccess } = usePermissions();
+
+  const accessibleCards = panelCards.filter((card) => hasApplicationAccess(card.id));
 
   const handleNavigation = (link: string) => {
     router.push(link);

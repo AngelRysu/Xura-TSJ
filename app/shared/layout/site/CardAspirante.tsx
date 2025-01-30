@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import { CardHome } from '@/app/shared/common';
 import estadosRepublica from '@/app/mocks/estadosRepublica';
+import { useAuthContext } from '@/app/context/AuthContext';
 import VerifyCode from './VerifyCode';
 
 interface CardAspiranteProps {
@@ -40,18 +41,19 @@ export default function CardAspirante({
   fechaNacimiento = '',
   numEntidadReg = '',
 }: CardAspiranteProps) {
+  const { setNoti } = useAuthContext();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [credencialId, setCredencialId] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   const nombreCompleto = `${nombre} ${apellidoPaterno} ${apellidoMaterno}`;
 
-  const formatPassword = (passwd: string) => {
-    if (passwd.length > 4) {
-      const hiddenPart = '*'.repeat(passwd.length - 4);
-      return `${hiddenPart}${passwd.slice(-4)}`;
+  const formatHide = (text: string) => {
+    if (text.length > 4) {
+      const hiddenPart = '*'.repeat(text.length - 4);
+      return `${hiddenPart}${text.slice(-4)}`;
     }
-    return passwd;
+    return text;
   };
 
   const formatFechaNacimiento = (fecha: string) => {
@@ -93,6 +95,11 @@ export default function CardAspirante({
 
       if (!response.ok) {
         setError('Error en la creación de credencial');
+        setNoti({
+          open: true,
+          type: 'error',
+          message: 'Acuda a servicios escolares',
+        });
         return;
       }
 
@@ -202,7 +209,7 @@ export default function CardAspirante({
         />
         <TextField
           label='Celular'
-          value={celular}
+          value={formatHide(celular)}
           fullWidth
           disabled
           variant='outlined'
@@ -216,7 +223,7 @@ export default function CardAspirante({
         />
         <TextField
           label='Contraseña'
-          value={formatPassword(password)}
+          value={formatHide(password)}
           fullWidth
           disabled
           variant='outlined'

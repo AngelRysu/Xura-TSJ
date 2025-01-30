@@ -8,6 +8,9 @@ interface User {
   correo?: string;
   curp?: string;
   celular?: string;
+  aplicaciones?: string;
+  grupos?: string;
+  nombre?: string;
 }
 
 interface Noti {

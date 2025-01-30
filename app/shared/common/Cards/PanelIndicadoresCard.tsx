@@ -14,12 +14,12 @@ const panelCards = [
   {
     icon: <AssessmentOutlinedIcon fontSize='large' />,
     title: 'Captación',
-    link: '/indicadores/captacion',
+    link: '/data/captacion',
   },
   {
     icon: <AssessmentOutlinedIcon fontSize='large' />,
     title: 'Matrícula',
-    link: '/indicadores/matricula',
+    link: '/data/matricula',
   },
 ];
 
