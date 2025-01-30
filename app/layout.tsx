@@ -5,6 +5,7 @@ import AuthProvider from '@/app/context/AuthProvider';
 import { MainLay } from '@/app/shared/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '@/app/shared/themes/fontTheme';
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: 'Xura',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
       <body>
+        <SessionProvider>
         <AuthProvider>
           <CssBaseline />
           <ThemeProvider theme={theme}>
@@ -24,6 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </MainLay>
           </ThemeProvider>
         </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

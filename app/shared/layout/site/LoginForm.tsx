@@ -1,16 +1,15 @@
 import {
-  useState, Dispatch, SetStateAction, ChangeEvent,
+  useState, Dispatch, SetStateAction, ChangeEvent,useEffect,
 } from 'react';
 import {
   Box, TextField, InputAdornment, IconButton, Button, Typography, Divider,
 } from '@mui/material';
 import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import Image from 'next/image';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession, signOut} from 'next-auth/react';
 import { useAuthContext } from '@/app/context/AuthContext';
 import { madaniArabicRegular } from '@/public/assets/fonts';
 import SubmitNewLogin from './SubmitNewLogin';
-
 interface LoginPayload {
   curp?: string;
   celular?: string;
@@ -53,6 +52,7 @@ export default function LoginForm({
   const { setLoading } = useAuthContext();
   const [form, setForm] = useState({ account: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const { data: session } = useSession();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -68,6 +68,16 @@ export default function LoginForm({
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
+  };
+
+  const handleGoogleSignIn = async () => {
+    const result = await signIn('google', { redirect: false });
+  
+    if (result?.ok) {
+      console.log('Inicio de sesión exitoso');  
+    } else {
+      console.error('Error al iniciar sesión');
+    }
   };
 
   const handleSubmit = async () => {
@@ -113,6 +123,14 @@ export default function LoginForm({
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (session?.accessToken) {
+      localStorage.setItem('authToken', session.accessToken);
+      signOut();
+    }
+  }, [session]);
+  
 
   return (
     <>
@@ -224,7 +242,7 @@ export default function LoginForm({
             priority
           />
         )}
-        onClick={() => signIn('google')}
+        onClick={handleGoogleSignIn}
       >
         Google
       </Button>
