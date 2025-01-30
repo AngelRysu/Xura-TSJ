@@ -48,16 +48,19 @@ export const {
 
         if (response.ok) {
           const data = await response.json();
-          // eslint-disable-next-line no-param-reassign
-          token.accessToken = data.token;
+          return {
+            ...token,
+            accessToken: data.token,
+          };
         }
       }
       return token;
     },
     async session({ session, token }) {
-      // eslint-disable-next-line no-param-reassign
-      session.accessToken = token.accessToken as string;
-      return session;
+      return {
+        ...session,
+        accessToken: token.accessToken,
+      };
     },
   },
 });
