@@ -5,6 +5,7 @@ interface TokenPayload {
   celular: string;
   aplicaciones: string;
   grupos: string;
+  nombre: string;
   iat: number;
   exp: number;
   aud: string;
@@ -19,6 +20,7 @@ interface ParsedToken {
   celular: string;
   aplicaciones: string;
   grupos: string;
+  nombre: string;
   token: string;
 }
 
@@ -58,6 +60,7 @@ export default function getToken(): ParsedToken | null {
     celular,
     aplicaciones,
     grupos,
+    nombre,
   } = parsedJwt;
 
   // Verifica si el token ha expirado
@@ -73,6 +76,7 @@ export default function getToken(): ParsedToken | null {
     celular,
     aplicaciones,
     grupos,
+    nombre,
     token: jwt,
   };
 
