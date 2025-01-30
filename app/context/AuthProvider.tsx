@@ -42,6 +42,7 @@ export default function AuthProvider({ children }: ProviderProps) {
       celular: userData.celular,
       aplicaciones: userData.aplicaciones,
       grupos: userData.grupos,
+      nombre: userData.nombre,
     });
     localStorage.setItem('authToken', userData.token);
     router.push('/panel');
@@ -58,6 +59,7 @@ export default function AuthProvider({ children }: ProviderProps) {
         celular: storedUser.celular,
         aplicaciones: storedUser.aplicaciones,
         grupos: storedUser.grupos,
+        nombre: storedUser.nombre,
       });
 
       if (pathname === '/') {
