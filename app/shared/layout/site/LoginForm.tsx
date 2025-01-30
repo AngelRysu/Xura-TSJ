@@ -6,10 +6,11 @@ import {
 } from '@mui/material';
 import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import Image from 'next/image';
-import { signIn, useSession, signOut} from 'next-auth/react';
+import { signIn, useSession} from 'next-auth/react';
 import { useAuthContext } from '@/app/context/AuthContext';
 import { madaniArabicRegular } from '@/public/assets/fonts';
 import SubmitNewLogin from './SubmitNewLogin';
+import { useRouter } from 'next/router'
 interface LoginPayload {
   curp?: string;
   celular?: string;
@@ -70,16 +71,6 @@ export default function LoginForm({
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
   };
 
-  const handleGoogleSignIn = async () => {
-    const result = await signIn('google', { redirect: false });
-  
-    if (result?.ok) {
-      console.log('Inicio de sesión exitoso');  
-    } else {
-      console.error('Error al iniciar sesión');
-    }
-  };
-
   const handleSubmit = async () => {
     let valid = true;
     const errors = { account: '', password: '' };
@@ -127,7 +118,7 @@ export default function LoginForm({
   useEffect(() => {
     if (session?.accessToken) {
       localStorage.setItem('authToken', session.accessToken);
-      signOut();
+      window.location.href = '/panel';
     }
   }, [session]);
   
@@ -242,7 +233,7 @@ export default function LoginForm({
             priority
           />
         )}
-        onClick={handleGoogleSignIn}
+        onClick={() => signIn('google')}
       >
         Google
       </Button>

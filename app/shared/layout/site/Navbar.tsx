@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+
 import {
   AppBar,
   Toolbar,
@@ -49,6 +51,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     setUser(null);
     localStorage.removeItem('authToken');
+    signOut(),
     router.push('/');
   };
 

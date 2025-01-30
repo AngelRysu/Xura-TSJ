@@ -37,5 +37,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       return session;
     },
+    async signIn ({ user }){
+      if (user){
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/sesiones/google`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            api_key: process.env.NEXT_PUBLIC_API_KEY || '',
+          },
+          body: JSON.stringify({ correo: user.email }),
+        });
+        if (response.ok){
+          return true
+        }
+        return '/';
+      }
+      return '/';
+    },
   },
 });

@@ -37,7 +37,6 @@ const panelCards = [
 export default function PanelCard() {
   const router = useRouter();
   const { hasApplicationAccess } = usePermissions();
-
   const accessibleCards = panelCards.filter((card) => hasApplicationAccess(card.id));
 
   const handleNavigation = (link: string) => {
