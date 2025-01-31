@@ -1,7 +1,5 @@
 'use client';
 
-/* eslint-disable no-unused-vars */
-
 import { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
