@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 import {
   AppBar,
@@ -31,7 +31,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, setUser } = useAuthContext();
-
+  const { data: session } = useSession();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -51,7 +51,9 @@ export default function Navbar() {
   const handleLogout = async () => {
     setUser(null);
     localStorage.removeItem('authToken');
-    await signOut({ redirect: false });
+    if (session) {
+      await signOut({ redirect: false });
+    }
     router.push('/');
   };
 
