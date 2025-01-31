@@ -1,12 +1,13 @@
 import {
-  useState, Dispatch, SetStateAction, ChangeEvent,
+  useState, Dispatch, SetStateAction, ChangeEvent, useEffect,
 } from 'react';
 import {
   Box, TextField, InputAdornment, IconButton, Button, Typography, Divider,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { PersonOutline, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import Image from 'next/image';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useAuthContext } from '@/app/context/AuthContext';
 import { madaniArabicRegular } from '@/public/assets/fonts';
 import SubmitNewLogin from './SubmitNewLogin';
@@ -50,9 +51,11 @@ export default function LoginForm({
   onShowVerifyCode,
   onForgotPassword,
 }: LoginFormProps) {
+  const router = useRouter();
   const { setLoading } = useAuthContext();
   const [form, setForm] = useState({ account: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const { data: session } = useSession();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -113,6 +116,13 @@ export default function LoginForm({
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (session?.accessToken) {
+      localStorage.setItem('authToken', session.accessToken);
+      router.replace('/panel');
+    }
+  }, [session, router]);
 
   return (
     <>

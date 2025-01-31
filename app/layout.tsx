@@ -6,6 +6,7 @@ import PermissionsProvider from '@/app/context/PermissionsProvider';
 import { MainLay } from '@/app/shared/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '@/app/shared/themes/fontTheme';
+import { SessionProvider } from 'next-auth/react';
 
 export const metadata: Metadata = {
   title: 'Xura',
@@ -17,16 +18,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
       <body>
-        <AuthProvider>
-          <PermissionsProvider>
-            <CssBaseline />
-            <ThemeProvider theme={theme}>
-              <MainLay>
-                {children}
-              </MainLay>
-            </ThemeProvider>
-          </PermissionsProvider>
-        </AuthProvider>
+        <SessionProvider>
+          <AuthProvider>
+            <PermissionsProvider>
+              <CssBaseline />
+              <ThemeProvider theme={theme}>
+                <MainLay>
+                  {children}
+                </MainLay>
+              </ThemeProvider>
+            </PermissionsProvider>
+          </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

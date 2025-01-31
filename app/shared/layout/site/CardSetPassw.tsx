@@ -63,7 +63,7 @@ export default function CardSetPassw({
 
     try {
       const response = await fetch(`${domain}/sesiones/${idCredencial}/set-contrasena`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           api_key: apiKey || '',

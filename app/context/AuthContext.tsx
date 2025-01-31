@@ -10,6 +10,7 @@ interface User {
   celular?: string;
   aplicaciones?: string;
   grupos?: string;
+  nombre?: string;
 }
 
 interface Noti {
