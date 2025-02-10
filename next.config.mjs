@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['developer.tecmm.mx'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'developer.tecmm.mx',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 

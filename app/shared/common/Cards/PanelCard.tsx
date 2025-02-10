@@ -68,12 +68,10 @@ export default function PanelCard() {
     (currentPage + 1) * cardsPerPage,
   );
 
-  const getGridProps = (length: number, index: number) => {
+  const getGridProps = (length: number) => {
     if (length === 1) return { md: 4 };
     if (length === 2 || length === 3) return { xs: 12, sm: 6 };
     if (length === 4) return { xs: 12, sm: 6, md: 6 };
-    if (length === 5) return index < 3 ? { xs: 12, sm: 6, md: 4 } : { xs: 12, sm: 6 };
-    if (length === 6) return { xs: 12, sm: 6, md: 4 };
     return { xs: 12, sm: 6, md: 4 };
   };
 
@@ -144,8 +142,8 @@ export default function PanelCard() {
         }}
         key={key}
       >
-        {currentCards.map((card, index) => {
-          const { xs, sm, md } = getGridProps(currentCards.length, index);
+        {currentCards.map((card) => {
+          const { xs, sm, md } = getGridProps(currentCards.length);
           return (
             <Grid item key={card.id} xs={xs} sm={sm} md={md}>
               <Card
@@ -173,6 +171,7 @@ export default function PanelCard() {
                     alt={card.title}
                     width={300}
                     height={200}
+                    priority
                     style={{
                       objectFit: 'cover',
                       width: '100%',

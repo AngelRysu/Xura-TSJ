@@ -20,11 +20,11 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   { icon: <HomeIcon />, label: 'Panel', link: '/panel' },
-  { icon: <AppsOutlinedIcon />, label: 'Aplicaciones', link: '/aplicaciones' },
-  { icon: <WysiwygOutlinedIcon />, label: 'Módulos', link: '/modulos' },
-  { icon: <GroupsOutlinedIcon />, label: 'Grupos', link: '/grupos' },
-  { icon: <VpnKeyOutlinedIcon />, label: 'Roles', link: '/roles' },
-  { icon: <ContactMailOutlinedIcon />, label: 'Credenciales', link: '/credenciales' },
+  { icon: <AppsOutlinedIcon />, label: 'Aplicaciones', link: '/sso/aplicaciones' },
+  { icon: <WysiwygOutlinedIcon />, label: 'Módulos', link: '/sso/modulos' },
+  { icon: <GroupsOutlinedIcon />, label: 'Grupos', link: '/sso/grupos' },
+  { icon: <VpnKeyOutlinedIcon />, label: 'Roles', link: '/sso/roles' },
+  { icon: <ContactMailOutlinedIcon />, label: 'Credenciales', link: '/sso/credenciales' },
 ];
 
 const menuItemsData: MenuItem[] = [
