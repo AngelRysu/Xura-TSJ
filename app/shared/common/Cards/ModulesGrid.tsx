@@ -73,8 +73,8 @@ export default function ModulesGrid() {
 
   const getGridProps = (length: number) => {
     if (length === 1) return { md: 4 };
-    if (length === 2 || length === 3) return { xs: 12, sm: 6 };
-    if (length === 4) return { xs: 12, sm: 6, md: 6 };
+    if (length === 2 || length === 3) return { xs: 12, sm: 6, md: 4 };
+    if (length === 4) return { xs: 12, sm: 6, md: 4 };
     return { xs: 12, sm: 6, md: 4 };
   };
 
