@@ -37,6 +37,7 @@ export default function ModulesGrid() {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const [key, setKey] = useState(0);
   const cardsPerPage = 6;
+  const routeImage = process.env.IMAGES_ROUTE_URL;
   const totalPages = Math.ceil(accessibleModules.length / cardsPerPage);
 
   const triggerAnimation = (newDirection: 'left' | 'right') => {
@@ -168,7 +169,7 @@ export default function ModulesGrid() {
                     borderRadius: 3,
                   }}
                 >
-                  {module.img !== 'https://developer.tecmm.mx/img/null' ? (
+                  {module.img !== `${routeImage}/null` ? (
                     <Image
                       src={module.img}
                       alt={module.title}
