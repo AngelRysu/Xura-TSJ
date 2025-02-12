@@ -35,6 +35,8 @@ interface PermisoData {
   Subir: number;
 }
 
+type PermisoAccion = 'Agregar' | 'Consultar' | 'Editar' | 'Cancelar' | 'Subir';
+
 const buttonStyles = {
   py: 1,
   px: 3,
@@ -119,6 +121,25 @@ export default function ModalPermisos({
       setUpdatedPermisos({});
     }
   }, [open]);
+
+  useEffect(() => {
+    const newChecks = {
+      Agregar: false,
+      Consultar: false,
+      Editar: false,
+      Cancelar: false,
+      Subir: false,
+    };
+    (['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'] as PermisoAccion[])
+      .forEach((action) => {
+        newChecks[action] = filteredModules.length > 0
+        && filteredModules.every((module) => {
+          const currentVal = updatedPermisos[module.idModulo]?.[action] ?? module[action];
+          return currentVal === 1;
+        });
+      });
+    setColumnChecks(newChecks);
+  }, [filteredModules, updatedPermisos]);
 
   const handleSave = async () => {
     try {
