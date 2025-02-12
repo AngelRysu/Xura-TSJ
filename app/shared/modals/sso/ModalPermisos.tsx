@@ -28,10 +28,10 @@ interface PermisoData {
   nombreAplicacion: string;
   idModulo: number;
   nombreModulo: string;
-  Crear: number;
+  Agregar: number;
   Consultar: number;
-  Actualizar: number;
-  Eliminar: number;
+  Editar: number;
+  Cancelar: number;
   Subir: number;
 }
 
@@ -59,10 +59,10 @@ export default function ModalPermisos({
   const [loading, setLoading] = useState<boolean>(false);
   const { setNoti } = useAuthContext();
   const [columnChecks, setColumnChecks] = useState<{ [action: string]: boolean }>({
-    Crear: false,
+    Agregar: false,
     Consultar: false,
-    Actualizar: false,
-    Eliminar: false,
+    Editar: false,
+    Cancelar: false,
     Subir: false,
   });
 
@@ -81,14 +81,12 @@ export default function ModalPermisos({
             ),
             ([id, nombre]) => ({ id, nombre }),
           );
-
           setAplicaciones(uniqueApps);
         } finally {
           setLoading(false);
         }
       }
     };
-
     fetchPermisos();
   }, [open, selectedRole]);
 
@@ -97,10 +95,10 @@ export default function ModalPermisos({
       const modules = permisos.filter((permiso) => permiso.idAplicacion === selectedApp);
       setFilteredModules(modules);
       setColumnChecks({
-        Crear: false,
+        Agregar: false,
         Consultar: false,
-        Actualizar: false,
-        Eliminar: false,
+        Editar: false,
+        Cancelar: false,
         Subir: false,
       });
       setUpdatedPermisos({});
@@ -112,10 +110,10 @@ export default function ModalPermisos({
       setSelectedApp(null);
       setFilteredModules([]);
       setColumnChecks({
-        Crear: false,
+        Agregar: false,
         Consultar: false,
-        Actualizar: false,
-        Eliminar: false,
+        Editar: false,
+        Cancelar: false,
         Subir: false,
       });
       setUpdatedPermisos({});
@@ -128,10 +126,10 @@ export default function ModalPermisos({
       const updates = filteredModules.map((module) => ({
         idModulo: module.idModulo,
         idRol: selectedRole?.idRol || 0,
-        Crear: updatedPermisos[module.idModulo]?.Crear ?? module.Crear,
+        Agregar: updatedPermisos[module.idModulo]?.Agregar ?? module.Agregar,
         Consultar: updatedPermisos[module.idModulo]?.Consultar ?? module.Consultar,
-        Actualizar: updatedPermisos[module.idModulo]?.Actualizar ?? module.Actualizar,
-        Eliminar: updatedPermisos[module.idModulo]?.Eliminar ?? module.Eliminar,
+        Editar: updatedPermisos[module.idModulo]?.Editar ?? module.Editar,
+        Cancelar: updatedPermisos[module.idModulo]?.Eliminar ?? module.Cancelar,
         Subir: updatedPermisos[module.idModulo]?.Subir ?? module.Subir,
       }));
       await updateRecord({
@@ -182,7 +180,7 @@ export default function ModalPermisos({
       flex: 2,
       editable: false,
     },
-    ...['Crear', 'Consultar', 'Actualizar', 'Eliminar', 'Subir'].map((action) => ({
+    ...['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'].map((action) => ({
       field: action,
       headerName: action,
       flex: 1,
@@ -250,7 +248,7 @@ export default function ModalPermisos({
                   marginBottom: '15px',
                 }}
               >
-                {['Crear', 'Consultar', 'Actualizar', 'Eliminar', 'Subir'].map((action) => (
+                {['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'].map((action) => (
                   <FormControlLabel
                     key={action}
                     control={(
