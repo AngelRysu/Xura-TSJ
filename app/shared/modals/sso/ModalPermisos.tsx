@@ -129,7 +129,7 @@ export default function ModalPermisos({
         Agregar: updatedPermisos[module.idModulo]?.Agregar ?? module.Agregar,
         Consultar: updatedPermisos[module.idModulo]?.Consultar ?? module.Consultar,
         Editar: updatedPermisos[module.idModulo]?.Editar ?? module.Editar,
-        Cancelar: updatedPermisos[module.idModulo]?.Eliminar ?? module.Cancelar,
+        Cancelar: updatedPermisos[module.idModulo]?.Cancelar ?? module.Cancelar,
         Subir: updatedPermisos[module.idModulo]?.Subir ?? module.Subir,
       }));
       await updateRecord({
