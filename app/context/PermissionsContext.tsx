@@ -6,12 +6,13 @@ interface ModuleAccess {
   idModulo: number;
   moduloClave: string;
   moduloImagen: string;
+  moduloIcon: string;
   idAcceso: number;
   acciones: {
-    crear: number;
+    agregar: number;
     consultar: number;
-    actualizar: number;
-    eliminar: number;
+    editar: number;
+    cancelar: number;
     subir: number;
   };
 }

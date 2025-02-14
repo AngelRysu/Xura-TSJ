@@ -40,6 +40,7 @@ export default function PermissionsProvider({ children }: PermissionsProviderPro
           idModulo: modulo.idModulo,
           moduloClave: modulo.moduloClave,
           moduloImagen: modulo.moduloImagen,
+          moduloIcon: modulo.moduloIcon,
           idAcceso: modulo.accesos[0].idAcceso,
           acciones: modulo.accesos[0].acciones,
         })),

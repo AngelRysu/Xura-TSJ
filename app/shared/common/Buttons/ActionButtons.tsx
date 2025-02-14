@@ -12,6 +12,8 @@ import {
   SellOutlined,
 } from '@mui/icons-material';
 import { madaniArabicRegular } from '@/public/assets/fonts';
+import { usePermissions } from '@/app/context/PermissionsContext';
+import { usePathname } from 'next/navigation';
 
 interface ActionButtonsProps {
   tableType: 'aplicaciones' | 'credenciales' | 'grupos' | 'modulos' | 'roles';
@@ -20,11 +22,30 @@ interface ActionButtonsProps {
   onButtonClick: (actionType: string) => void;
 }
 
+interface Actions {
+  agregar?: number;
+  consultar?: number;
+  editar?: number;
+  cancelar?: number;
+  subir?: number;
+}
+
 export default function ActionButtons({
   tableType,
   selectedRowsCount,
   onButtonClick,
 }: ActionButtonsProps) {
+  const { permissions } = usePermissions();
+  const pathname = usePathname();
+
+  const moduleName = pathname.split('/').filter(Boolean)[1] || '';
+
+  const modulePermissions = permissions
+    .flatMap((app) => app.modulos)
+    .find((mod) => mod.moduloClave?.toLowerCase() === moduleName?.toLowerCase());
+
+  const allowedActions: Actions = modulePermissions?.acciones ?? {};
+
   const customButtonStyles = {
     borderRadius: '20px',
     color: 'rgb(50, 22, 155)',
@@ -46,28 +67,28 @@ export default function ActionButtons({
       label: 'Agregar',
       icon: <Add />,
       disabled: isMultipleSelection || isSingleSelection,
-      show: true,
+      show: allowedActions.agregar === 1,
     },
     {
       id: 'consultar',
       label: 'Consultar',
       icon: <Search />,
       disabled: isMultipleSelection || notSelection,
-      show: true,
+      show: allowedActions.consultar === 1,
     },
     {
       id: 'editar',
       label: 'Editar',
       icon: <EditOutlined />,
       disabled: isMultipleSelection || notSelection,
-      show: true,
+      show: allowedActions.editar === 1,
     },
     {
       id: 'cancelar',
       label: 'Cancelar',
       icon: <Close />,
       disabled: notSelection,
-      show: true,
+      show: allowedActions.cancelar === 1,
     },
     {
       id: 'perfil',
@@ -100,9 +121,13 @@ export default function ActionButtons({
   ];
 
   return (
-    <Box sx={{
-      display: 'flex', justifyContent: 'flex-end', gap: 2, marginBottom: 2,
-    }}
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: 2,
+        marginBottom: 2,
+      }}
     >
       {buttonsConfig.map(
         (button) => button.show && (
