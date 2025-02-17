@@ -22,6 +22,7 @@ export default function PanelCard() {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const [key, setKey] = useState(0);
   const cardsPerPage = 6;
+  const routeImage = process.env.IMAGES_ROUTE_URL;
 
   const accessibleCards = permissions.map((permission) => ({
     id: permission.idAplicacion.toString(),
@@ -70,8 +71,8 @@ export default function PanelCard() {
 
   const getGridProps = (length: number) => {
     if (length === 1) return { md: 4 };
-    if (length === 2 || length === 3) return { xs: 12, sm: 6 };
-    if (length === 4) return { xs: 12, sm: 6, md: 6 };
+    if (length === 2 || length === 3) return { xs: 12, sm: 6, md: 4 };
+    if (length === 4) return { xs: 12, sm: 6, md: 4 };
     return { xs: 12, sm: 6, md: 4 };
   };
 
@@ -165,7 +166,7 @@ export default function PanelCard() {
                   borderRadius: 3,
                 }}
               >
-                {card.img !== 'https://developer.tecmm.mx/img/null' ? (
+                {card.img !== `${routeImage}/null` ? (
                   <Image
                     src={card.img}
                     alt={card.title}

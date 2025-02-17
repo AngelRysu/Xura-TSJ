@@ -2,15 +2,11 @@
 
 import { useState, ReactElement } from 'react';
 import { Box, Typography } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
-import WysiwygOutlinedIcon from '@mui/icons-material/WysiwygOutlined';
-import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined';
-import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
-import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
+import { usePermissions } from '@/app/context/PermissionsContext';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import HomeIcon from '@mui/icons-material/Home';
+import getMuiIcon from '@/app/mocks/iconsMap';
 
 type MenuItem = {
   icon: ReactElement;
@@ -18,37 +14,32 @@ type MenuItem = {
   link: string;
 };
 
-const menuItems: MenuItem[] = [
-  { icon: <HomeIcon />, label: 'Panel', link: '/panel' },
-  { icon: <AppsOutlinedIcon />, label: 'Aplicaciones', link: '/sso/aplicaciones' },
-  { icon: <WysiwygOutlinedIcon />, label: 'Módulos', link: '/sso/modulos' },
-  { icon: <GroupsOutlinedIcon />, label: 'Grupos', link: '/sso/grupos' },
-  { icon: <VpnKeyOutlinedIcon />, label: 'Roles', link: '/sso/roles' },
-  { icon: <ContactMailOutlinedIcon />, label: 'Credenciales', link: '/sso/credenciales' },
-];
-
-const menuItemsData: MenuItem[] = [
-  { icon: <HomeIcon />, label: 'Panel', link: '/panel' },
-  {
-    icon: <AssessmentOutlinedIcon />,
-    label: 'Captación',
-    link: '/data/captacion',
-  },
-  {
-    icon: <AssessmentOutlinedIcon />,
-    label: 'Matrícula',
-    link: '/data/matricula',
-  },
-];
-
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { permissions } = usePermissions();
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleMouseEnter = () => setIsOpen(true);
   const handleMouseLeave = () => setIsOpen(false);
 
-  const currentMenuItems = pathname.startsWith('/data') ? menuItemsData : menuItems;
+  // Obtener clave de aplicación desde la ruta
+  const appClave = pathname.split('/')[1];
+
+  // Filtrar módulos según la aplicación correspondiente
+  const currentMenuItems: MenuItem[] = [
+    {
+      icon: <HomeIcon />,
+      label: 'Panel',
+      link: '/panel',
+    },
+    ...permissions
+      .filter((app) => app.aplicacionClave.toLowerCase() === appClave.toLowerCase())
+      .flatMap((app) => app.modulos.map((mod) => ({
+        icon: getMuiIcon(mod.moduloIcon),
+        label: mod.moduloClave,
+        link: `${app.link}/${mod.moduloClave.toLowerCase()}`,
+      }))),
+  ];
 
   return (
     <Box
@@ -75,7 +66,6 @@ export default function Sidebar() {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              width: '100%',
               px: 2,
               py: 2,
               cursor: 'pointer',
