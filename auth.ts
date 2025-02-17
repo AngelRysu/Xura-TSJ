@@ -17,6 +17,7 @@ export const {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  trustHost: true,
   callbacks: {
     async signIn({ user }) {
       if (user) {
