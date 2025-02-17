@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'xura.tecmm.mx',
+        hostname: 'xura.tsj.mx',
         port: '',
         pathname: '/**',
       },
