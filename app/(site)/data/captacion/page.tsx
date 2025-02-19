@@ -1,52 +1,5 @@
 import { DashboardCaptacion } from '@/app/components/dashboard';
-
-const fetchData = async (url: any) => {
-  try {
-    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Error fetching ${url}: ${response.statusText}`);
-    }
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      return data;
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
-};
-
-const fetchString = async (url: any) => {
-  try {
-    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Error fetching ${url}: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    return '';
-  }
-};
-
-const periodoActivo = () => fetchString('/captacionp');
-
-const captacionTotal = () => fetchData('/captaciont');
-
-const captacionExamen = () => fetchData('/captacione');
-
-const getUltimaFecha = () => fetchString('/captacionfin');
-
-const generoTotal = () => fetchData('/captacion/genero');
-
-const modalidadTotal = () => fetchData('/captacion/modalidad');
-
-const estatusTotal = () => fetchData('/captacion/estatus');
-
-const captacionClase = () => fetchData('/captacion/unidad');
-
-const fechasCaptacion = () => fetchData('/captaciond');
-
-const procedenciaTotal = () => fetchData('/captacion/procedencia');
+import { fetchData, fetchString } from '@/app/services/api';
 
 export default async function ServerComponent() {
   const [
@@ -61,17 +14,28 @@ export default async function ServerComponent() {
     captacionE,
     ultimaFecha,
   ] = await Promise.all([
-    captacionTotal(),
-    generoTotal(),
-    modalidadTotal(),
-    estatusTotal(),
-    periodoActivo(),
-    fechasCaptacion(),
-    procedenciaTotal(),
-    captacionClase(),
-    captacionExamen(),
-    getUltimaFecha(),
+    fetchData('/captaciont'),
+    fetchData('/captacion/genero'),
+    fetchData('/captacion/modalidad'),
+    fetchData('/captacion/estatus'),
+    fetchString('/captacionp'),
+    fetchData('/captaciond'),
+    fetchData('/captacion/procedencia'),
+    fetchData('/captacion/unidad'),
+    fetchData('/captacione'),
+    fetchString('/captacionfin'),
   ]);
+
+  // Filtrar datos por clase
+  const clases = ['A', 'B', 'C', 'D', 'E', 'N'];
+  const captacionPorClase: { [key: string]: typeof captacionData } = {};
+  const examenPorClase: { [key: string]: typeof captacionE } = {};
+
+  clases.forEach((clase) => {
+    captacionPorClase[clase] = captacionData.filter((item) => item.clase === clase);
+    examenPorClase[clase] = captacionE.filter((item) => captacionPorClase[clase].some((c) => c
+      .clave === item.clave));
+  });
 
   const data = {
     total: totalData?.[0]?.cantidad || 20,
@@ -96,6 +60,8 @@ export default async function ServerComponent() {
     captacionData: captacionData || [],
     captacionExamen: captacionE || [],
     ultimaFecha: ultimaFecha?.ultimaFecha || '',
+    captacionClase: captacionPorClase || '',
+    examenClase: examenPorClase || '',
   };
 
   return <DashboardCaptacion data={data} />;
