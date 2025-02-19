@@ -7,3 +7,4 @@ export { default as PanelCard } from './PanelCard';
 export { default as IndicatorCard } from './IndicatorCard';
 export { default as PanelIndicadoresCard } from './PanelIndicadoresCard';
 export { default as CardTemplateClient } from './CardTemplateClient';
+export { default as IndicatorCardEstatus } from './IndicatorCardEstatus';

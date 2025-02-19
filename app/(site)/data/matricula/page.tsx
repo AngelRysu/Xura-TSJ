@@ -1,313 +1,148 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import { Groups2 } from '@mui/icons-material';
 import {
-  AccountBalanceOutlined, Cast, JoinInner, RemoveCircle, Report,
-  PauseCircle, CheckCircle, Woman, Man, FlagCircle, Groups,
-} from '@mui/icons-material';
-import { GraphBarAll, CardTemplateClient, LineChartPeriods } from '@/app/shared/common';
+  GraphBarAll, IndicatorCard, LineChartPeriods, IndicatorCardEstatus,
+} from '@/app/shared/common';
 import { TableUnidades } from '@/app/components/dashboard';
 import { madaniArabicBold } from '@/public/assets/fonts';
+import { fetchData, fetchString } from '@/app/services/api';
+import { capitalizeWords, getIcon } from '@/app/shared/common/Util/iconsFormat';
 
-const fetchData = async (url: any) => {
-  try {
-    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Error fetching ${url}: ${response.statusText}`);
-    }
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      return data;
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
-};
-
-const fetchString = async (url: any) => {
-  try {
-    const response = await fetch(`${process.env.HOST}${url}`, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Error fetching ${url}: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    return '';
-  }
-};
-
-const periodoActivo = () => fetchString('/periodo');
-
-const getPeriodos = () => fetchData('/matricula/periodo');
-
-const matriculaTotal = () => fetchData('/matricula/total');
-
-const generoTotal = () => fetchData('/estudiantes/genero');
-
-const modalidadTotal = () => fetchData('/modalidades');
-
-const estatusTotal = () => fetchData('/matricula/estatus');
-
-const matriculaClase = (clase: string) => fetchData(`/matricula/clase/${clase}`);
-
-// const procedenciaTotal = () => fetchData('/procedencias');
-
-const getVariacion = () => fetchData('/matricula/variacion');
-
-const capitalizeWords = (str: string) => str
-  .toLowerCase()
-  .replace(/\b\w/g, (char) => char.toUpperCase());
-
-function getIconEstatus(estatus: string) {
-  switch (estatus) {
-    case 'Vigente':
-      return <CheckCircle sx={{ color: '#308fff', fontSize: '2.5rem' }} />;
-    case 'Cursos Especiales':
-      return <FlagCircle sx={{ color: '#54c98f', fontSize: '2.5rem' }} />;
-    case 'Baja Definitiva':
-      return <RemoveCircle sx={{ color: '#ff4d63', fontSize: '2.5rem' }} />;
-    case 'Baja Temporal':
-      return <PauseCircle sx={{ color: '#ffae31', fontSize: '2.5rem' }} />;
-    case 'Baja Especial':
-      return <Report sx={{ color: '#d8d8d8', fontSize: '2.5rem' }} />;
-    default:
-      return null;
-  }
-}
-
-function getIcon(modalidad: string) {
-  switch (modalidad) {
-    case 'A DISTANCIA':
-      return <Cast sx={{ color: '#308fff', fontSize: '4rem' }} />;
-    case 'ESCOLARIZADA':
-      return <AccountBalanceOutlined sx={{ color: '#54c98f', fontSize: '4rem' }} />;
-    case 'MIXTA':
-      return <JoinInner sx={{ color: '#ff4d63', fontSize: '4rem' }} />;
-    default:
-      return null;
-  }
-}
 interface GeneroData {
   genero: string;
   cantidad: number;
 }
+
 interface ModalidadData {
   modalidad: string;
   cantidad: number;
 }
+
 interface EstatusData {
   modalidad: string;
   cantidad: number;
   estatus: string,
 }
 
-interface EstatusIndicatorProps {
-  estatusData: EstatusData[];
-}
-interface ModalidadIndicatorProps {
-  modalidadData: ModalidadData[];
-}
-interface GeneroIndicatorProps {
-  generoData: GeneroData[];
-}
-interface MatriculaIndicatorProps {
-  estudiantes: string;
+interface IndicatorCardItem {
+  label: string;
+  value: string;
+  icon: React.JSX.Element | null;
 }
 
-function MatriculaIndicator({ estudiantes }: MatriculaIndicatorProps) {
+const mapDataToItems = (data: any[], category: string, total?: number): IndicatorCardItem[] => data
+  .map((item) => ({
+    label: capitalizeWords(item[category]),
+    value: total ? new Intl.NumberFormat('es-MX').format(item.cantidad) : item.cantidad,
+    icon: getIcon(item[category], category),
+  }));
+
+function MatriculaIndicator({ estudiantes }: { estudiantes: string }) {
   return (
-    <CardTemplateClient
+    <IndicatorCard
       title='Matrícula'
-      description={(
-        <Box
-          component='span'
-          sx={{
-            fontWeight: 'bold',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 0,
-          }}
-        >
-          <Groups sx={{ fontSize: '10rem', color: '#308fff' }} />
-          <Typography
-            variant='h4'
-            sx={{ textAlign: 'center' }}
-            className={madaniArabicBold.className}
-          >
-            {estudiantes || 0}
-          </Typography>
-        </Box>
-      )}
+      value={estudiantes}
+      icon={<Groups2 sx={{ fontSize: '4rem', color: '#308fff' }} />}
     />
   );
 }
 
-function GeneroIndicator({ generoData, total }: GeneroIndicatorProps & { total: number }) {
+function GeneroIndicator({ generoData, total }: { generoData: GeneroData[], total: number }) {
   return (
-    <CardTemplateClient
-      title='Género'
-      description={(
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 0.5,
-            width: '100%',
-            justifyContent: 'center',
-          }}
-        >
-          {generoData.map((genero) => (
-            <Box
-              component='span'
-              key={genero.genero}
-              sx={{
-                fontWeight: 'bold',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 1.5,
-              }}
-            >
-              {genero.genero === 'F' ? (
-                <Woman sx={{ fontSize: '8rem', color: '#ff4d63' }} />
-              ) : (
-                <Man sx={{ fontSize: '8rem', color: '#308fff' }} />
-              )}
-              <Typography variant='h4' component='div' className={madaniArabicBold.className}>
-                {new Intl.NumberFormat('es-MX', { style: 'percent' }).format(
-                  genero.cantidad / total,
-                )}
-              </Typography>
-              <Typography variant='h5' component='span'>
-                {new Intl.NumberFormat('es-MX').format(genero.cantidad)}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      )}
+    <IndicatorCard
+      title='Genero'
+      items={mapDataToItems(generoData, 'genero')}
+      layout='horizontal'
+      total={total}
     />
   );
 }
 
-function ModalidadIndicator({ modalidadData, total }: ModalidadIndicatorProps & { total: number }) {
+function ModalidadIndicator({ modalidadData, total }:
+  { modalidadData: ModalidadData[], total: number }) {
   return (
-    <CardTemplateClient
+    <IndicatorCard
       title='Modalidad'
-      description={(
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 2,
-            width: '100%',
-          }}
-        >
-          {modalidadData.map((modalidad) => (
-            <Box
-              key={modalidad.modalidad}
-              sx={{
-                fontWeight: 'bold',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 2,
-              }}
-            >
-              <Typography component='div' sx={{ fontWeight: 'bold' }}>
-                {capitalizeWords(modalidad.modalidad)}
-              </Typography>
-              <Typography variant='h4' component='div' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat('es-MX', { style: 'percent' }).format(
-                  modalidad.cantidad / total,
-                )}
-              </Typography>
-              {getIcon(modalidad.modalidad)}
-              <Typography component='span'>
-                {new Intl.NumberFormat('es-MX').format(modalidad.cantidad)}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      )}
+      items={mapDataToItems(modalidadData, 'modalidad')}
+      layout='horizontal'
+      total={total}
     />
   );
 }
 
-function EstatusIndicator({ estatusData, total }: EstatusIndicatorProps & { total: number }) {
+function EstatusIndicator({ estatusData, total }: { estatusData: EstatusData[], total: number }) {
   return (
-    <CardTemplateClient
+    <IndicatorCardEstatus
       title='Estatus'
-      description={(
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 0,
-            width: '100%',
-          }}
-        >
-          {estatusData.map((estatus) => (
-            <Box
-              key={estatus.estatus}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                paddingY: 0.5,
-              }}
-            >
-              <Typography component='span' sx={{ fontWeight: 'bold', flex: 2 }}>
-                {capitalizeWords(estatus.estatus)}
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '2rem',
-                }}
-              >
-                {getIconEstatus(estatus.estatus)}
-              </Box>
-              <Typography
-                component='span'
-                sx={{ flex: 1, textAlign: 'center', fontWeight: 'bold' }}
-              >
-                {new Intl.NumberFormat('es-MX').format(estatus.cantidad)}
-              </Typography>
-              <Typography
-                component='span'
-                sx={{
-                  flex: 1,
-                  textAlign: 'center',
-                  color: '#32129a',
-                  fontWeight: 'bold',
-                }}
-              >
-                {new Intl.NumberFormat(
-                  'es-MX',
-                  { style: 'percent', maximumFractionDigits: 2 },
-                ).format(estatus.cantidad / total)}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      )}
+      type='Matricula'
+      value={total}
+      items={mapDataToItems(estatusData, 'estatus')}
     />
   );
 }
 
-export default async function DashboardPage() {
-  const totalData = await matriculaTotal();
+export default function DashboardPage() {
+  const [periodo, setPeriodo] = useState('');
+  const [estPeriodos, setEstPeriodos] = useState<any[]>([]);
+  const [matriculaData, setMatriculaData] = useState<any[]>([]);
+  const [generoDatos, setGeneroData] = useState<any[]>([]);
+  const [modalidadData, setModalidadData] = useState<any[]>([]);
+  const [estatusData, setEstatusData] = useState<any[]>([]);
+  const [claseA, setClaseA] = useState<any[]>([]);
+  const [claseB, setClaseB] = useState<any[]>([]);
+  const [claseC, setClaseC] = useState<any[]>([]);
+  const [claseD, setClaseD] = useState<any[]>([]);
+  const [claseE, setClaseE] = useState<any[]>([]);
+  const [claseN, setClaseN] = useState<any[]>([]);
+  const [matriculaVariacion, setVariacionData] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchDataFromAPI() {
+      try {
+        const periodoActivo = await fetchString('/periodo');
+        const periodos = await fetchData(`/matricula/periodo`);
+        const matricula = await fetchData(`/matricula/total`);
+        const genero = await fetchData(`/estudiantes/genero`);
+        const modalidad = await fetchData(`/modalidades`);
+        const estatus = await fetchData(`/matricula/estatus`);
+        const variacion = await fetchData(`/matricula/variacion`);
+
+        const claseAPre = await fetchData(`/matricula/clase/A`);
+        const claseBPre = await fetchData(`/matricula/clase/B`);
+        const claseCPre = await fetchData(`/matricula/clase/C`);
+        const claseDPre = await fetchData(`/matricula/clase/D`);
+        const claseEPre = await fetchData(`/matricula/clase/E`);
+        const claseNPre = await fetchData(`/matricula/clase/N`);
+
+        setClaseA(claseAPre);
+        setClaseB(claseBPre);
+        setClaseC(claseCPre);
+        setClaseD(claseDPre);
+        setClaseE(claseEPre);
+        setClaseN(claseNPre);
+
+        setPeriodo(periodoActivo);
+        setEstPeriodos(periodos);
+        setMatriculaData(matricula);
+        setGeneroData(genero);
+        setModalidadData(modalidad);
+        setEstatusData(estatus);
+
+        setVariacionData(variacion);
+      } catch (error) {
+        console.error('Error al obtener datos:', error); // eslint-disable-line no-console
+      }
+    }
+    fetchDataFromAPI();
+  }, []);
+
+  const totalData = matriculaData;
   const total = totalData[0]?.estudiantes || 0;
   const numEstudiantes = new Intl.NumberFormat('es-MX').format(total);
 
-  const generoDatos = await generoTotal();
-  const modalidadData = await modalidadTotal();
-  const estatusData = await estatusTotal();
-  const periodo = await periodoActivo();
-  const estPeriodos = await getPeriodos();
   // const procedencias = await procedenciaTotal();
 
   const periodos = {
@@ -316,8 +151,6 @@ export default async function DashboardPage() {
     max: Math.max(...estPeriodos.map((item) => item.estudiantes)),
     min: Math.min(...estPeriodos.map((item) => item.estudiantes)),
   };
-
-  const matriculaVariacion = await getVariacion();
 
   return (
     <Box
@@ -351,7 +184,7 @@ export default async function DashboardPage() {
         sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)',
+            xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)', xl: 'repeat(4, 1fr)',
           },
           width: '100%',
         }}
@@ -365,7 +198,6 @@ export default async function DashboardPage() {
         sx={{
           gridTemplateRows: 'auto',
           gap: 1,
-          padding: { xs: 1, xl: 3 },
           width: '100%',
         }}
       >
@@ -373,27 +205,28 @@ export default async function DashboardPage() {
           sx={{
             display: 'grid',
             gridTemplateColumns: {
-              md: 'repeat(1, 1fr)',
-              lg: 'repeat(2, 1fr)',
-              xl: 'repeat(3, 1fr)',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(2, 1fr)',
+              lg: 'repeat(3, 1fr)',
+              xl: 'repeat(4, 1fr)',
             },
             gridTemplateRows: 'auto',
             gap: 1,
             width: '100%',
           }}
         >
-          <GraphBarAll title='Clase D' chartData={await matriculaClase('D')} dataType='unidad' />
-          <GraphBarAll title='Clase C' chartData={await matriculaClase('C')} dataType='unidad' />
-          <GraphBarAll title='Clase B' chartData={await matriculaClase('B')} dataType='unidad' />
-          <GraphBarAll title='Clase A' chartData={await matriculaClase('A')} dataType='unidad' />
+          <GraphBarAll title='Clase D' chartData={claseD} dataType='unidad' />
+          <GraphBarAll title='Clase C' chartData={claseC} dataType='unidad' />
+          <GraphBarAll title='Clase B' chartData={claseB} dataType='unidad' />
+          <GraphBarAll title='Clase A' chartData={claseA} dataType='unidad' />
           <GraphBarAll
-            title='Nuevas Unidades Académicas'
-            chartData={await matriculaClase('N')}
+            title='Nuevas Unidades'
+            chartData={claseN}
             dataType='unidad'
           />
           <GraphBarAll
             title='Extensiones'
-            chartData={await matriculaClase('E')}
+            chartData={claseE}
             dataType='unidad'
           />
         </Box>
