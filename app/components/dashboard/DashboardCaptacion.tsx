@@ -1,17 +1,21 @@
 'use client';
 
-import { ReactNode } from 'react';
+import React from 'react';
 import { Box, Typography } from '@mui/material';
-import {
-  Woman, Man, Groups2, HomeWork, DomainDisabled, CastForEducation, Apartment, CheckCircle,
-  AssignmentTurnedIn, Cancel, MonetizationOn, School,
-} from '@mui/icons-material';
+import { Groups2 } from '@mui/icons-material';
 import {
   GraphBarAll, LineChartPeriods, IndicatorCard, IndicatorCardEstatus,
 } from '@/app/shared/common';
-// import { MapaJalisco } from '@/app/shared/common';
-// import topojal from '@/app/mocks/json/jal_topojson.json';
-import { madaniArabicBold } from '@/public/assets/fonts';
+// import { MapaJalisco } from '@/src/app/shared/common';
+// import topojal from '../../../jal_topojson.json';
+import { capitalizeWords, getIcon } from '@/app/shared/common/Util/iconsFormat';
+
+interface Examen {
+  nombre: string;
+  clave: string;
+  aspirantes: number;
+  examenPagado: number;
+}
 
 interface DataState {
   total: number;
@@ -29,6 +33,8 @@ interface DataState {
   captacionData: Array<any>;
   captacionExamen: Array<any>;
   ultimaFecha: string;
+  captacionClase: {};
+  examenClase: Record<string, Examen[]>;
 }
 
 interface DashboardPageProps {
@@ -53,106 +59,68 @@ interface EstatusData {
 interface IndicatorCardItem {
   label: string;
   value: string;
-  icon: ReactNode;
+  icon: React.JSX.Element | null;
 }
 
-const getIcon = (type: string, category: string) => {
-  switch (category) {
-    case 'genero':
-      return type === 'M'
-        ? <Woman sx={{ fontSize: '10rem', color: '#ff4d63' }} />
-        : <Man sx={{ fontSize: '10rem', color: '#308fff' }} />;
-    case 'modalidad':
-      switch (type) {
-        case 'MIXTA':
-          return <HomeWork sx={{ color: '#308fff', fontSize: '6rem' }} />;
-        case 'NO ESCOLARIZADA':
-          return <DomainDisabled sx={{ color: '#308fff', fontSize: '6rem' }} />;
-        case 'A DISTANCIA':
-          return <CastForEducation sx={{ color: '#308fff', fontSize: '6rem' }} />;
-        case 'ESCOLARIZADA':
-          return <Apartment sx={{ color: '#308fff', fontSize: '6rem' }} />;
-        default: return null;
-      }
-    case 'estatus':
-      switch (type) {
-        case 'REGISTRADO SIN VALIDAR':
-          return <Cancel sx={{ color: '#ff4d63', fontSize: '1.5rem' }} />;
-        case 'REGISTRADO VALIDADO':
-          return <CheckCircle sx={{ color: '#ffae31', fontSize: '1.5rem' }} />;
-        case 'EXAMEN PAGADO':
-          return <MonetizationOn sx={{ color: '#54c98f', fontSize: '1.75rem' }} />;
-        case 'PRESENTO EXAMEN':
-          return <AssignmentTurnedIn sx={{ color: '#54c98f', fontSize: '1.75rem' }} />;
-        case 'INSCRIPCION PAGADA':
-          return <MonetizationOn sx={{ color: '#308fff', fontSize: '2rem' }} />;
-        case 'INSCRITO':
-          return <School sx={{ color: '#308fff', fontSize: '2rem' }} />;
-        default: return null;
-      }
-    default:
-      return null;
-  }
-};
+const mapDataToItems = (data: any[], category: string, total?: number): IndicatorCardItem[] => data
+  .map((item) => ({
+    label: capitalizeWords(item[category]),
+    value: total ? new Intl.NumberFormat('es-MX').format(item.cantidad) : item.cantidad,
+    icon: getIcon(item[category], category),
+  }));
 
-const capitalizeWords = (str: string) => str.toLowerCase()
-  .replace(/\b\w/g, (char) => char.toUpperCase());
-
-const mapDataToItems = (
-  data: any[],
-  category: string,
-  total?: number,
-): IndicatorCardItem[] => data.map((item) => ({
-  label: capitalizeWords(item[category]),
-  value: total ? new Intl.NumberFormat('es-MX').format(item.cantidad) : item.cantidad,
-  icon: getIcon(item[category], category),
-}));
-
-function CaptacionTotalIndicator({ captacionTotal, estatusData }:
-  { captacionTotal: number, estatusData: EstatusData[] }) {
-  const registradosSinValidar = estatusData.find((data) => data.estatus
-    === 'REGISTRADO SIN VALIDAR')?.cantidad || 0;
-  const registradosValidados = estatusData.find((data) => data.estatus
-    === 'REGISTRADO VALIDADO')?.cantidad || 0;
+function CaptacionTotalIndicator({ captacionTotal, estatusData }: {
+  captacionTotal: number, estatusData: EstatusData[] }) {
+  const registradosSinValidar = estatusData.find((data) => data
+    .estatus === 'REGISTRADO SIN VALIDAR')?.cantidad || 0;
+  const registradosValidados = estatusData.find((data) => data
+    .estatus === 'REGISTRADO VALIDADO')?.cantidad || 0;
   const candidatosAvanzados = captacionTotal - registradosSinValidar - registradosValidados;
   const porcentajeAvanzados = (candidatosAvanzados / captacionTotal) || 0;
   return (
     <IndicatorCard
       title='Registros totales'
-      description={`${new Intl.NumberFormat('es-MX').format(candidatosAvanzados)} 
-      - ${new Intl.NumberFormat('es-MX', { style: 'percent', maximumFractionDigits: 0 })
-      .format(porcentajeAvanzados)} con exámen pagado`}
+      description={
+        `Con exámen pagado ${new Intl.NumberFormat('es-MX')
+          .format(candidatosAvanzados)} - ${new Intl
+          .NumberFormat('es-MX', { style: 'percent', maximumFractionDigits: 0 })
+          .format(porcentajeAvanzados)}`
+      }
       value={new Intl.NumberFormat('es-MX').format(captacionTotal)}
-      icon={<Groups2 sx={{ fontSize: '7rem', color: '#308fff' }} />}
-      colors={{ iconColor: `#308fff` }}
+      icon={<Groups2 sx={{ fontSize: '4rem', color: '#308fff' }} />}
+      colors={{
+        iconColor: `#308fff`,
+      }}
     />
   );
 }
 
-function GeneroIndicator({ generoData }:
-  { generoData: GeneroData[] }) {
+function GeneroIndicator({ generoData, captacionTotal } : {
+  generoData: GeneroData[], captacionTotal: number }) {
   return (
     <IndicatorCard
       title='Genero'
       items={mapDataToItems(generoData, 'genero')}
       layout='horizontal'
+      total={captacionTotal}
     />
   );
 }
 
-function ModalidadIndicator({ modalidadData }:
-  { modalidadData: ModalidadData[] }) {
+function ModalidadIndicator({ modalidadData, captacionTotal }:{
+  modalidadData: ModalidadData[], captacionTotal: number }) {
   return (
     <IndicatorCard
       title='Modalidad'
       items={mapDataToItems(modalidadData, 'modalidad')}
       layout='horizontal'
+      total={captacionTotal}
     />
   );
 }
 
-function EstatusIndicator({ estatusData, captacionTotal }:
-  { estatusData: EstatusData[]; captacionTotal: number }) {
+function EstatusIndicator({ estatusData, captacionTotal }:{
+  estatusData: EstatusData[], captacionTotal: number }) {
   return (
     <IndicatorCardEstatus
       title='Estatus'
@@ -162,7 +130,7 @@ function EstatusIndicator({ estatusData, captacionTotal }:
   );
 }
 
-export default function DashboardCaptacion({ data }: DashboardPageProps) {
+function DashboardCaptacion({ data }: DashboardPageProps) {
   return (
     <Box sx={{
       display: 'flex',
@@ -185,19 +153,14 @@ export default function DashboardCaptacion({ data }: DashboardPageProps) {
         <Typography
           variant='h1'
           sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
-          className={madaniArabicBold.className}
         >
-          Captación
-          {' '}
-          {data.periodo}
+          {`Captación ${data.periodo}`}
         </Typography>
         <Typography
           variant='h5'
           sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
         >
-          Última actualización
-          {' '}
-          {data.ultimaFecha}
+          {`Última actualización ${data.ultimaFecha}`}
         </Typography>
       </Box>
       <Box sx={{
@@ -207,19 +170,28 @@ export default function DashboardCaptacion({ data }: DashboardPageProps) {
       }}
       >
         <CaptacionTotalIndicator captacionTotal={data.total} estatusData={data.estatusData} />
-        <GeneroIndicator generoData={data.generoData} />
-        <ModalidadIndicator modalidadData={data.modalidadData} />
+        <GeneroIndicator generoData={data.generoData} captacionTotal={data.total} />
+        <ModalidadIndicator modalidadData={data.modalidadData} captacionTotal={data.total} />
         <EstatusIndicator estatusData={data.estatusData} captacionTotal={data.total} />
       </Box>
       <Box sx={{ padding: { xs: 1, xl: 1 }, alignItems: 'center', width: '100%' }}>
         <Box sx={{
           display: 'grid',
           alignItems: 'center',
-          gridTemplateColumns: { xs: 'repeat(1, 1fr)', lg: 'repeat(1, 1fr)' },
+          gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(3, 1fr)' },
           width: '100%',
         }}
         >
-          <GraphBarAll title='Unidades' chartData={data.captacionExamen} dataType='captacion' />
+          {Object.entries(data.examenClase).map(([clase, valores]) => (
+            valores.length > 0 && (
+              <GraphBarAll
+                key={clase}
+                title={`Clase ${clase}`}
+                chartData={valores}
+                dataType='captacion'
+              />
+            )
+          ))}
           <LineChartPeriods
             xAxisData={data.fechas.xAxis}
             yAxisData={data.fechas.yAxis}
@@ -233,3 +205,5 @@ export default function DashboardCaptacion({ data }: DashboardPageProps) {
     </Box>
   );
 }
+
+export default DashboardCaptacion;
