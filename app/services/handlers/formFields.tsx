@@ -198,4 +198,22 @@ export const CredencialFields: Field[] = [
       pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
     },
   },
+  {
+    name: 'tipo',
+    label: 'Autenticación',
+    type: 'select',
+    validation: {
+      required: true,
+      errorMessage: 'Debe seleccionar una autenticación.',
+    },
+  },
+  {
+    name: 'perfil',
+    label: 'Perfil',
+    type: 'select',
+    validation: {
+      required: true,
+      errorMessage: 'Debe seleccionar un perfil.',
+    },
+  },
 ];

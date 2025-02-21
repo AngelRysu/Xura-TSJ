@@ -110,6 +110,8 @@ export default function TableCredenciales() {
         correo,
         celular,
         contrasena,
+        tipo,
+        perfil,
       } = data;
 
       if (!curp || !nombre || !primerApellido || !fechaNacimiento || !numEntidadReg) {
@@ -160,7 +162,8 @@ export default function TableCredenciales() {
             correo,
             celular,
             contrasena,
-            tipo: 'JWT',
+            tipo,
+            perfil,
           }),
         });
 
@@ -345,6 +348,7 @@ export default function TableCredenciales() {
         onSubmit={handleSaveCredencial}
         mode={modalMode}
         selectedData={selectedRowData}
+        type='credenciales'
       />
       <ModalCancelar
         open={openCancelModal}
