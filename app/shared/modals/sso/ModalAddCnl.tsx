@@ -104,6 +104,11 @@ export default function ModalAddCnl({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const tipoOptions = [
+    { value: 'JWT', label: 'JWT' },
+    { value: 'OAuth 2.0', label: 'OAuth 2.0' },
+  ];
+
   useEffect(() => {
     const fetchDynamicOptions = async () => {
       if (!open) return;
@@ -140,6 +145,13 @@ export default function ModalAddCnl({
               }));
             }
           }
+        } else if (type === 'credenciales') {
+          const { data } = await getData({ endpoint: '/roles' });
+          const options = data.map((perfil: { idRol: number; nombre: string }) => ({
+            value: perfil.idRol.toString(),
+            label: perfil.nombre,
+          }));
+          setDynamicOptions(options);
         }
       } catch {
         setDynamicOptions([]);
@@ -317,7 +329,7 @@ export default function ModalAddCnl({
   const getGridSize = (index: number, totalFields: number) => {
     if (totalFields === 2) return 6;
     if (totalFields === 3) return 6;
-    if (totalFields === 5) return index === 1 ? 8 : 4;
+    if (totalFields === 7) return index === 1 ? 8 : 4;
     return 12;
   };
 
@@ -330,7 +342,84 @@ export default function ModalAddCnl({
           {fields.map((field, index) => (
             <Grid item xs={getGridSize(index, fields.length)} key={field.name}>
               {/* eslint-disable-next-line no-nested-ternary */}
-              {type === 'modulos' && field.name === 'aplicacion' ? (
+              {field.type === 'select' ? (
+                // eslint-disable-next-line no-nested-ternary
+                field.name === 'tipo' ? (
+                  <FormControl fullWidth>
+                    <InputLabel>{field.label}</InputLabel>
+                    <Select
+                      variant='outlined'
+                      label={field.label}
+                      name={field.name}
+                      disabled={isReadOnly || field.disabled}
+                      value={
+                        Array.isArray(formValues[field.name])
+                          ? formValues[field.name][0] || ''
+                          : (formValues[field.name] as string) || ''
+                      }
+                      onChange={handleInputChange}
+                      error={!!errors[field.name]}
+                    >
+                      {tipoOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                // eslint-disable-next-line no-nested-ternary
+                ) : field.name === 'perfil' && type === 'credenciales' ? (
+                  mode === 'editar' || mode === 'consultar' ? null : (
+                    <FormControl fullWidth>
+                      <InputLabel>{field.label}</InputLabel>
+                      <Select
+                        variant='outlined'
+                        label={field.label}
+                        name={field.name}
+                        disabled={isReadOnly || field.disabled}
+                        value={
+                          Array.isArray(formValues[field.name])
+                            ? formValues[field.name][0] || ''
+                            : (formValues[field.name] as string) || ''
+                        }
+                        onChange={handleInputChange}
+                        error={!!errors[field.name]}
+                      >
+                        {dynamicOptions.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )
+                ) : (
+                  <FormControl fullWidth>
+                    <InputLabel>{field.label}</InputLabel>
+                    <Select
+                      variant='outlined'
+                      label={field.label}
+                      name={field.name}
+                      disabled={isReadOnly || field.disabled}
+                      value={
+                        Array.isArray(formValues[field.name])
+                          ? formValues[field.name][0] || ''
+                          : (formValues[field.name] as string) || ''
+                      }
+                      onChange={handleInputChange}
+                      error={!!errors[field.name]}
+                      multiple={field.multiple}
+                    >
+                      {dynamicOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )
+              // eslint-disable-next-line no-nested-ternary
+              ) : field.name === 'aplicacion' && type === 'modulos' ? (
                 <FormControl fullWidth>
                   <InputLabel>{field.label}</InputLabel>
                   <Select
@@ -417,38 +506,39 @@ export default function ModalAddCnl({
                   disabled={isReadOnly || field.disabled
                     || (field.name === 'curp' && mode === 'editar')}
                   InputProps={{
-                    // eslint-disable-next-line no-nested-ternary
-                    endAdornment: field.name === 'contrasena' ? (
-                      <InputAdornment position='end'>
-                        <IconButton onClick={handleTogglePasswordVisibility}>
-                          {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
-                        </IconButton>
-                      </InputAdornment>
-                    ) : field.name === 'curp' && mode === 'agregar' ? (
-                      <InputAdornment position='end'>
-                        {/* eslint-disable-next-line no-nested-ternary */}
-                        {loadingCurp ? (
-                          <CircularProgress size={24} />
-                        ) : curpVerified ? (
-                          <Check color='success' />
-                        ) : (
-                          <PersonAddAltOutlined
-                            onClick={formValues.curp?.length === 18
-                              ? handleVerifyCurp : undefined}
-                            sx={{
-                              cursor: formValues.curp?.length === 18
-                                ? 'pointer' : 'default',
-                              color: formValues.curp?.length === 18
-                                ? 'primary.main' : 'text.disabled',
-                            }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ) : (
-                      <InputAdornment position='end'>
-                        {field.icon || <EditOutlined />}
-                      </InputAdornment>
-                    ),
+                    endAdornment:
+                      // eslint-disable-next-line no-nested-ternary
+                      field.name === 'contrasena' ? (
+                        <InputAdornment position='end'>
+                          <IconButton onClick={handleTogglePasswordVisibility}>
+                            {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+                          </IconButton>
+                        </InputAdornment>
+                      ) : field.name === 'curp' && mode === 'agregar' ? (
+                        <InputAdornment position='end'>
+                          {/* eslint-disable-next-line no-nested-ternary */}
+                          {loadingCurp ? (
+                            <CircularProgress size={24} />
+                          ) : curpVerified ? (
+                            <Check color='success' />
+                          ) : (
+                            <PersonAddAltOutlined
+                              onClick={formValues.curp?.length === 18
+                                ? handleVerifyCurp : undefined}
+                              sx={{
+                                cursor: formValues.curp?.length === 18
+                                  ? 'pointer' : 'default',
+                                color: formValues.curp?.length === 18
+                                  ? 'primary.main' : 'text.disabled',
+                              }}
+                            />
+                          )}
+                        </InputAdornment>
+                      ) : (
+                        <InputAdornment position='end'>
+                          {field.icon || <EditOutlined />}
+                        </InputAdornment>
+                      ),
                   }}
                 />
               )}
