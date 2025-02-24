@@ -2,11 +2,17 @@
 
 import { useState, ChangeEvent } from 'react';
 import {
-  Typography, Button, TextField, InputAdornment, IconButton, Link,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Link,
 } from '@mui/material';
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { CardHome } from '@/app/shared/common';
 import { madaniArabicSemiBold } from '@/public/assets/fonts';
+import { useAuthContext } from '@/app/context/AuthContext';
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 const domain = process.env.NEXT_PUBLIC_URL;
@@ -24,12 +30,20 @@ export default function CardSetPassw({
   celular,
   onSuccess,
 }: CardSetPasswProps) {
+  const { setNoti } = useAuthContext();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+
+  const [errorPassword, setErrorPassword] = useState('');
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState('');
+
+  const isValidPassword = (passw: string) => passw.length >= 8
+    && /[A-Z]/.test(passw)
+    && /\d/.test(passw)
+    && /[!@#$%^&*(),.?":{}|<>]/.test(passw);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -41,17 +55,43 @@ export default function CardSetPassw({
 
   const handleChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setError('');
+    setErrorPassword('');
   };
 
   const handleChangeConfirmPassword = (e: ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
-    setError('');
+    setErrorConfirmPassword('');
+  };
+
+  const handlePasswordBlur = () => {
+    if (password && !isValidPassword(password)) {
+      setErrorPassword(
+        `La contraseña debe tener al menos 8 caracteres,
+         una mayúscula, un número y un carácter especial.`,
+      );
+    } else {
+      setErrorPassword('');
+    }
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    if (confirmPassword && confirmPassword !== password) {
+      setErrorConfirmPassword('Las contraseñas no coinciden.');
+    } else {
+      setErrorConfirmPassword('');
+    }
   };
 
   const handleSetPassword = async () => {
+    if (!isValidPassword(password)) {
+      setErrorPassword(
+        `La contraseña debe tener al menos 8 caracteres,
+         una mayúscula, un número y un carácter especial.`,
+      );
+      return;
+    }
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setErrorConfirmPassword('Las contraseñas no coinciden.');
       return;
     }
 
@@ -70,18 +110,18 @@ export default function CardSetPassw({
         },
         body: JSON.stringify(requestData),
       });
-
       if (response.ok) {
-        setSuccessMessage('Contraseña actualizada con éxito.');
-        setTimeout(() => {
-          setSuccessMessage('');
-          onSuccess();
-        }, 2000);
+        setNoti({
+          open: true,
+          type: 'success',
+          message: 'Contraseña actualizada correctamente.',
+        });
+        onSuccess();
       } else {
-        setError('Hubo un error al actualizar la contraseña. Inténtalo más tarde.');
+        setErrorPassword('Hubo un error al actualizar la contraseña. Inténtalo más tarde.');
       }
     } catch {
-      setError('Hubo un error al procesar la solicitud.');
+      setErrorPassword('Hubo un error al procesar la solicitud.');
     }
   };
 
@@ -105,7 +145,9 @@ export default function CardSetPassw({
         fullWidth
         value={password}
         onChange={handleChangePassword}
-        error={Boolean(error)}
+        onBlur={handlePasswordBlur}
+        error={Boolean(errorPassword)}
+        helperText={errorPassword}
         InputProps={{
           endAdornment: (
             <InputAdornment position='end'>
@@ -117,6 +159,7 @@ export default function CardSetPassw({
         }}
         sx={{ marginBottom: '16px' }}
       />
+
       <TextField
         label='Confirmar contraseña'
         variant='outlined'
@@ -124,8 +167,9 @@ export default function CardSetPassw({
         fullWidth
         value={confirmPassword}
         onChange={handleChangeConfirmPassword}
-        error={Boolean(error)}
-        helperText={error}
+        onBlur={handleConfirmPasswordBlur}
+        error={Boolean(errorConfirmPassword)}
+        helperText={errorConfirmPassword}
         InputProps={{
           endAdornment: (
             <InputAdornment position='end'>
@@ -137,18 +181,6 @@ export default function CardSetPassw({
         }}
         sx={{ marginBottom: '24px' }}
       />
-
-      {successMessage && (
-        <Typography
-          sx={{
-            color: 'green',
-            textAlign: 'center',
-            marginBottom: '24px',
-          }}
-        >
-          {successMessage}
-        </Typography>
-      )}
 
       <Typography
         component='div'
@@ -170,7 +202,12 @@ export default function CardSetPassw({
         color='primary'
         fullWidth
         onClick={handleSetPassword}
-        disabled={!password || !confirmPassword || password !== confirmPassword}
+        disabled={
+          !password
+          || !confirmPassword
+          || password !== confirmPassword
+          || !isValidPassword(password)
+        }
         sx={{
           py: 2,
           textTransform: 'capitalize',

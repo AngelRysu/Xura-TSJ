@@ -212,7 +212,6 @@ export const CredencialFields: Field[] = [
     label: 'Perfil',
     type: 'select',
     validation: {
-      required: true,
       errorMessage: 'Debe seleccionar un perfil.',
     },
   },
