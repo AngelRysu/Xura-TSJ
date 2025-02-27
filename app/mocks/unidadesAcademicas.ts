@@ -56,6 +56,12 @@ const unidadesAcademicas = [
   }, {
     id: 9, clave: 'HU', nombre: 'HUERTA - TOMATLÁN', color: '#d8d8d8', label: 'TOMATLÁN',
   },
+
+  {
+    id: 32, clave: 'TA', nombre: 'CUQUIO', color: '#ffae31', label: 'CUQUIO',
+  }, {
+    id: 32, clave: 'TA', nombre: 'IXTLAHUACAN', color: '#d8d8d8', label: 'IXTLAHUACAN',
+  },
 ];
 
 const carreras = [

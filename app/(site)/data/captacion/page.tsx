@@ -26,15 +26,14 @@ export default async function ServerComponent() {
     fetchString('/captacionfin'),
   ]);
 
-  // Filtrar datos por clase
   const clases = ['A', 'B', 'C', 'D', 'E', 'N'];
   const captacionPorClase: { [key: string]: typeof captacionData } = {};
   const examenPorClase: { [key: string]: typeof captacionE } = {};
 
   clases.forEach((clase) => {
     captacionPorClase[clase] = captacionData.filter((item) => item.clase === clase);
-    examenPorClase[clase] = captacionE.filter((item) => captacionPorClase[clase].some((c) => c
-      .clave === item.clave));
+    examenPorClase[clase] = captacionE.filter((item) => captacionPorClase[clase]
+      .some((c) => c.nombre === item.nombre));
   });
 
   const data = {
