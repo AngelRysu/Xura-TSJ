@@ -67,7 +67,7 @@ export default function GraphBarAll({
     : chartData.map((item) => item.nombre ?? '');
 
   const getColorByClave = (clave: string, index: number) => {
-    if (dataType === 'unidad' || dataType === 'captacion') {
+    if (dataType === 'unidad') {
       const unidadC = unidadesAcademicas.find((u) => u.nombre === clave);
       return unidadC ? unidadC.color : '#000000';
     }
@@ -87,9 +87,9 @@ export default function GraphBarAll({
       router.push(`matricula/unidad/${clave}`);
     } else if (dataType === 'carrera') {
       router.push(`/matricula/unidad/${unidad}/carrera/${clave}`);
-    } else {
+    } /* else {
       router.push(`captacion/detalle/${clave}`);
-    }
+    } */
   };
 
   const getUnidad = (nombre: string) => {
@@ -98,7 +98,7 @@ export default function GraphBarAll({
   };
 
   const abbreviateName = (name: string, barras: number) => {
-    const pxPorCaracter = 8;
+    const pxPorCaracter = 9;
     const minCaracteres = 3;
     const maxCaracteres = 15;
     const anchoPorBarra = (chartSize.width - 130) / barras;
@@ -127,7 +127,7 @@ export default function GraphBarAll({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const MIN_HEIGHT = 4;
+  const MIN_HEIGHT = 0;
   let series;
   switch (dataType) {
     case 'unidad':
@@ -163,7 +163,10 @@ export default function GraphBarAll({
   }
 
   return (
-    <Box sx={{ width: '100%', padding: 2, height: chartDimensions.height }}>
+    <Box sx={{
+      width: '100%', padding: 2, height: chartDimensions.height, marginTop: 1,
+    }}
+    >
       <Paper elevation={3} sx={{ padding: 2, height: '100%', minHeight: chartDimensions.height }}>
         {image && (
           <Box
@@ -196,7 +199,9 @@ export default function GraphBarAll({
               {
                 scaleType: 'band',
                 data: claves,
-                colorMap: { type: 'ordinal', values: claves, colors },
+                ...(dataType !== 'captacion' && {
+                  colorMap: { type: 'ordinal', values: claves, colors },
+                }),
                 valueFormatter: (clave) => abbreviateName(
                   names[claves.indexOf(clave)],
                   claves.length,

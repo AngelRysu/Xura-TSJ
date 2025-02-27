@@ -69,23 +69,22 @@ const mapDataToItems = (data: any[], category: string, total?: number): Indicato
     icon: getIcon(item[category], category),
   }));
 
-function CaptacionTotalIndicator({ captacionTotal, estatusData }: {
+function CaptacionTotalIndicator({ captacionTotal, estatusData } : {
   captacionTotal: number, estatusData: EstatusData[] }) {
-  const registradosSinValidar = estatusData.find((data) => data
-    .estatus === 'REGISTRADO SIN VALIDAR')?.cantidad || 0;
-  const registradosValidados = estatusData.find((data) => data
-    .estatus === 'REGISTRADO VALIDADO')?.cantidad || 0;
+  const registradosSinValidar = estatusData
+    .find((data) => data.estatus === 'REGISTRADO SIN VALIDAR')?.cantidad || 0;
+  const registradosValidados = estatusData
+    .find((data) => data.estatus === 'REGISTRADO VALIDADO')?.cantidad || 0;
   const candidatosAvanzados = captacionTotal - registradosSinValidar - registradosValidados;
   const porcentajeAvanzados = (candidatosAvanzados / captacionTotal) || 0;
   return (
     <IndicatorCard
       title='Registros totales'
-      description={
-        `Con exámen pagado ${new Intl.NumberFormat('es-MX')
-          .format(candidatosAvanzados)} - ${new Intl
-          .NumberFormat('es-MX', { style: 'percent', maximumFractionDigits: 0 })
-          .format(porcentajeAvanzados)}`
-      }
+      description={`Con exámen pagado ${new Intl.NumberFormat('es-MX')
+        .format(candidatosAvanzados)} - ${new Intl.NumberFormat(
+        'es-MX',
+        { style: 'percent', maximumFractionDigits: 0 },
+      ).format(porcentajeAvanzados)}`}
       value={new Intl.NumberFormat('es-MX').format(captacionTotal)}
       icon={<Groups2 sx={{ fontSize: '4rem', color: '#308fff' }} />}
       colors={{
@@ -128,6 +127,25 @@ function EstatusIndicator({ estatusData, captacionTotal }:{
       items={mapDataToItems(estatusData, 'estatus')}
     />
   );
+}
+
+type ChartDataItem = {
+  clave: string;
+  nombre: string;
+  programa?: string;
+  estudiantes?: number;
+  cantidad?: number;
+  aspirantes?: number;
+  examenPagado?: number;
+};
+
+function transformData(data1: [string, ChartDataItem[]][]): ChartDataItem[] {
+  return data1.flatMap(([, unidades]) => unidades.map((unidad) => ({
+    clave: unidad.clave,
+    nombre: unidad.nombre,
+    aspirantes: unidad.aspirantes,
+    examenPagado: unidad.examenPagado,
+  })));
 }
 
 function DashboardCaptacion({ data }: DashboardPageProps) {
@@ -175,6 +193,19 @@ function DashboardCaptacion({ data }: DashboardPageProps) {
         <EstatusIndicator estatusData={data.estatusData} captacionTotal={data.total} />
       </Box>
       <Box sx={{ padding: { xs: 1, xl: 1 }, alignItems: 'center', width: '100%' }}>
+        <Box sx={{
+          display: 'grid',
+          alignItems: 'center',
+          gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(1, 1fr)' },
+          width: '100%',
+        }}
+        >
+          <GraphBarAll
+            title='Captación General'
+            chartData={transformData(Object.entries(data.examenClase))}
+            dataType='captacion'
+          />
+        </Box>
         <Box sx={{
           display: 'grid',
           alignItems: 'center',
