@@ -33,9 +33,13 @@ interface PermisoData {
   Editar: number;
   Cancelar: number;
   Subir: number;
+  Validar: number;
+  Autorizar: number;
+  Publicar: number;
 }
 
-type PermisoAccion = 'Agregar' | 'Consultar' | 'Editar' | 'Cancelar' | 'Subir';
+type PermisoAccion = 'Agregar' | 'Consultar' | 'Editar' | 'Cancelar'
+| 'Subir' | 'Validar' | 'Autorizar' | 'Publicar';
 
 const buttonStyles = {
   py: 1,
@@ -66,6 +70,9 @@ export default function ModalPermisos({
     Editar: false,
     Cancelar: false,
     Subir: false,
+    Validar: false,
+    Autorizar: false,
+    Publicar: false,
   });
 
   useEffect(() => {
@@ -94,7 +101,9 @@ export default function ModalPermisos({
 
   useEffect(() => {
     if (selectedApp !== null) {
-      const modules = permisos.filter((permiso) => permiso.idAplicacion === selectedApp);
+      const modules = permisos.filter(
+        (permiso) => permiso.idAplicacion === selectedApp,
+      );
       setFilteredModules(modules);
       setColumnChecks({
         Agregar: false,
@@ -102,6 +111,9 @@ export default function ModalPermisos({
         Editar: false,
         Cancelar: false,
         Subir: false,
+        Validar: false,
+        Autorizar: false,
+        Publicar: false,
       });
       setUpdatedPermisos({});
     }
@@ -117,6 +129,9 @@ export default function ModalPermisos({
         Editar: false,
         Cancelar: false,
         Subir: false,
+        Validar: false,
+        Autorizar: false,
+        Publicar: false,
       });
       setUpdatedPermisos({});
     }
@@ -129,15 +144,28 @@ export default function ModalPermisos({
       Editar: false,
       Cancelar: false,
       Subir: false,
+      Validar: false,
+      Autorizar: false,
+      Publicar: false,
     };
-    (['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'] as PermisoAccion[])
-      .forEach((action) => {
-        newChecks[action] = filteredModules.length > 0
+    (
+      [
+        'Agregar',
+        'Consultar',
+        'Editar',
+        'Cancelar',
+        'Subir',
+        'Validar',
+        'Autorizar',
+        'Publicar',
+      ] as PermisoAccion[]
+    ).forEach((action) => {
+      newChecks[action] = filteredModules.length > 0
         && filteredModules.every((module) => {
           const currentVal = updatedPermisos[module.idModulo]?.[action] ?? module[action];
           return currentVal === 1;
         });
-      });
+    });
     setColumnChecks(newChecks);
   }, [filteredModules, updatedPermisos]);
 
@@ -152,6 +180,9 @@ export default function ModalPermisos({
         Editar: updatedPermisos[module.idModulo]?.Editar ?? module.Editar,
         Cancelar: updatedPermisos[module.idModulo]?.Cancelar ?? module.Cancelar,
         Subir: updatedPermisos[module.idModulo]?.Subir ?? module.Subir,
+        Validar: updatedPermisos[module.idModulo]?.Validar ?? module.Validar,
+        Autorizar: updatedPermisos[module.idModulo]?.Autorizar ?? module.Autorizar,
+        Publicar: updatedPermisos[module.idModulo]?.Publicar ?? module.Publicar,
       }));
       await updateRecord({
         endpoint: `/roles/${selectedRole?.idRol}/accesos`,
@@ -201,7 +232,16 @@ export default function ModalPermisos({
       flex: 2,
       editable: false,
     },
-    ...['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'].map((action) => ({
+    ...[
+      'Agregar',
+      'Consultar',
+      'Editar',
+      'Cancelar',
+      'Subir',
+      'Validar',
+      'Autorizar',
+      'Publicar',
+    ].map((action) => ({
       field: action,
       headerName: action,
       flex: 1,
@@ -240,11 +280,7 @@ export default function ModalPermisos({
         </Box>
       ) : (
         <Box>
-          <Typography
-            sx={{
-              color: '#32169b',
-            }}
-          >
+          <Typography sx={{ color: '#32169b' }}>
             Seleccione una aplicación:
           </Typography>
           <Select
@@ -269,7 +305,16 @@ export default function ModalPermisos({
                   marginBottom: '15px',
                 }}
               >
-                {['Agregar', 'Consultar', 'Editar', 'Cancelar', 'Subir'].map((action) => (
+                {[
+                  'Agregar',
+                  'Consultar',
+                  'Editar',
+                  'Cancelar',
+                  'Subir',
+                  'Validar',
+                  'Autorizar',
+                  'Publicar',
+                ].map((action) => (
                   <FormControlLabel
                     key={action}
                     control={(

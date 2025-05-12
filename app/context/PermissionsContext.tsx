@@ -14,6 +14,9 @@ interface ModuleAccess {
     editar: number;
     cancelar: number;
     subir: number;
+    validar: number,
+    autorizar: number,
+    publicar: number,
   };
 }
 
