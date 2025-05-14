@@ -40,8 +40,8 @@ const getCurp = async (curp: string) => {
   try {
     const response = await axios.get(`https://curp-mexico1.p.rapidapi.com/porCurp/${curp}`, {
       headers: {
-        'x-rapidapi-key': 'a385736a0emsh5d3a0044a9bfe40p12370djsnc1eb53a79306',
-        'x-rapidapi-host': 'curp-mexico1.p.rapidapi.com',
+        'x-rapidapi-key': process.env.REACT_APP_CURP_KEY,
+        'x-rapidapi-host': process.env.REACT_APP_CURP_PATH,
       },
     });
     return response.data;
