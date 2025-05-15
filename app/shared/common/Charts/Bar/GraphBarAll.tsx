@@ -181,7 +181,7 @@ export default function GraphBarAll({
             src={image}
           />
         )}
-        <Typography gutterBottom variant='h4' component='div'>
+        <Typography gutterBottom variant='h5' component='div'>
           {title}
         </Typography>
         {description && (
