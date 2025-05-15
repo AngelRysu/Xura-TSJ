@@ -9,6 +9,7 @@ import {
 // import { MapaJalisco } from '@/src/app/shared/common';
 // import topojal from '../../../jal_topojson.json';
 import { capitalizeWords, getIcon } from '@/app/shared/common/Util/iconsFormat';
+import { madaniArabicBold } from '@/public/assets/fonts';
 
 interface Examen {
   nombre: string;
@@ -169,8 +170,9 @@ function DashboardCaptacion({ data }: DashboardPageProps) {
       }}
       >
         <Typography
-          variant='h1'
-          sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
+          variant='h4'
+          sx={{ whiteSpace: 'nowrap' }}
+          className={madaniArabicBold.className}
         >
           {`Captación ${data.periodo}`}
         </Typography>
@@ -206,31 +208,34 @@ function DashboardCaptacion({ data }: DashboardPageProps) {
             dataType='captacion'
           />
         </Box>
-        <Box sx={{
-          display: 'grid',
-          alignItems: 'center',
-          gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(3, 1fr)' },
-          width: '100%',
-        }}
+        <Box
+          sx={{
+            display: 'grid',
+            alignItems: 'center',
+            gridTemplateColumns: { xs: 'repeat(1, 1fr)', md: 'repeat(3, 1fr)' },
+            width: '100%',
+            gap: 2,
+          }}
         >
-          {Object.entries(data.examenClase).map(([clase, valores]) => (
-            valores.length > 0 && (
-              <GraphBarAll
-                key={clase}
-                title={`Clase ${clase}`}
-                chartData={valores}
-                dataType='captacion'
-              />
-            )
-          ))}
-          <LineChartPeriods
-            xAxisData={data.fechas.xAxis}
-            yAxisData={data.fechas.yAxis}
-            label='Aspirantes'
-            color='#3f8ef8'
-            yAxisRange={{ min: data.fechas.min - 10, max: data.fechas.max }}
-          />
-          {/* <MapaJalisco topojson={topojal} entidad={14} data={data.procedencias} /> */}
+          {Object.entries(data.examenClase).map(([clase, valores]) => (valores.length > 0 ? (
+            <GraphBarAll
+              key={clase}
+              title={`Clase ${clase}`}
+              chartData={valores}
+              dataType='captacion'
+            />
+          ) : null))}
+
+          <Box sx={{ gridColumn: '1 / -1', width: '100%' }}>
+            <LineChartPeriods
+              xAxisData={data.fechas.xAxis}
+              yAxisData={data.fechas.yAxis}
+              label='Aspirantes'
+              color='#3f8ef8'
+              yAxisRange={{ min: data.fechas.min - 10, max: data.fechas.max }}
+            />
+            {/* <MapaJalisco topojson={topojal} entidad={14} data={data.procedencias} /> */}
+          </Box>
         </Box>
       </Box>
     </Box>

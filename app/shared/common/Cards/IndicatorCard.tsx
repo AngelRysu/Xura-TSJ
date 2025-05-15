@@ -14,9 +14,9 @@ interface IndicatorCardProps {
     valueColor?: string;
     hoverBackgroundColor?: string;
   };
-  layout?: 'vertical' | 'horizontal'; // Define la orientación
-  sx?: object; // Estilos adicionales para personalizar
-  link?: string; // Enlace para la tarjeta
+  layout?: 'vertical' | 'horizontal';
+  sx?: object;
+  link?: string;
   total?: number;
 }
 
@@ -25,14 +25,25 @@ function IndicatorCard({
   icon,
   value,
   description,
-  items,
+  items = [],
   colors = {},
   layout = 'vertical',
   sx = {},
   link,
   total,
 }: IndicatorCardProps) {
+  const isGenero = title.toLowerCase() === 'genero';
+  const isModalidad = title.toLowerCase() === 'modalidad';
   const isVertical = layout === 'vertical';
+
+  // Ajustar el número de columnas dinámicamente para Modalidad
+  // eslint-disable-next-line no-nested-ternary
+  const columns = isGenero
+    ? 'repeat(4, 1fr)'
+    : isModalidad
+      ? `repeat(${items.length * 2}, 1fr)`
+      : 'repeat(2, 1fr)';
+
   const cardContent = (
     <CardTemplateClient
       title={title}
@@ -47,7 +58,7 @@ function IndicatorCard({
               gap: 1,
             }}
           >
-            {icon && (
+            {icon && !isGenero && (
               <Box
                 sx={{
                   color: colors.iconColor || '#308fff',
@@ -64,16 +75,19 @@ function IndicatorCard({
                 alignItems: isVertical ? 'center' : 'flex-start',
               }}
             >
-              <Typography
-                color={colors.valueColor || 'text.primary'}
-                component='div'
-                variant='h1'
-                sx={{ textAlign: 'center' }}
-              >
-                {typeof value === 'number'
-                  ? new Intl.NumberFormat('es-MX').format(value)
-                  : value}
-              </Typography>
+              {value !== undefined && (
+                <Typography
+                  color={colors.valueColor || 'text.primary'}
+                  component='div'
+                  variant='h4'
+                  sx={{ textAlign: 'center' }}
+                >
+                  {typeof value === 'number'
+                    ? new Intl.NumberFormat('es-MX').format(value)
+                    : value}
+                </Typography>
+              )}
+
               {description && (
                 <Typography
                   sx={{
@@ -84,67 +98,63 @@ function IndicatorCard({
                   {description}
                 </Typography>
               )}
-              {items && (
+
+              {items.length > 0 && (
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexDirection: isVertical ? 'column' : 'row',
+                    display: 'grid',
+                    gridTemplateColumns: columns,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     gap: 1,
                   }}
                 >
                   {items.map((item) => (
-                    <Box
-                      component='span'
-                      key={item.label}
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1,
-                      }}
-                    >
-                      {item.icon && (
-                        <Box
-                          sx={{
-                            color: colors.iconColor || '#308fff',
-                          }}
-                        >
-                          {item.icon}
-                        </Box>
-                      )}
-                      <Typography
+                    <React.Fragment key={item.label}>
+                      {/* Ícono */}
+                      <Box
                         sx={{
-                          fontWeight: 'bold',
-                          textAlign: 'center',
-                          fontSize: '0.8rem',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          color: colors.iconColor || '#308fff',
                         }}
                       >
-                        {item.label}
-                      </Typography>
-                      <Typography
-                        variant='body1'
+                        {item.icon}
+                      </Box>
+
+                      {/* Valor */}
+                      <Box
                         sx={{
-                          color: colors.valueColor || 'text.primary',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
                         }}
                       >
-                        {
-                          new Intl.NumberFormat('es-MX').format(Number(item.value))
-                        }
-                      </Typography>
-                      {total && (
                         <Typography
-                          variant='body2'
+                          variant='body1'
                           sx={{
                             color: colors.valueColor || 'text.primary',
                             fontWeight: 'bold',
+                            fontSize: '1.2rem',
                           }}
                         >
-                          {new Intl.NumberFormat('es-MX', { style: 'percent' }).format(
-                            Number(item.value) / total,
-                          )}
+                          {new Intl.NumberFormat('es-MX').format(Number(item.value))}
                         </Typography>
-                      )}
-                    </Box>
+                        {total && (
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: colors.valueColor || 'text.primary',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            {new Intl.NumberFormat('es-MX', { style: 'percent' })
+                              .format(Number(item.value) / total)}
+                          </Typography>
+                        )}
+                      </Box>
+                    </React.Fragment>
                   ))}
                 </Box>
               )}
