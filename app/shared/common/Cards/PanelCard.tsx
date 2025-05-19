@@ -12,10 +12,13 @@ import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { usePermissions } from '@/app/context/PermissionsContext';
+import { useAuthContext } from '@/app/context/AuthContext';
 import { useState } from 'react';
+import md5 from 'md5';
 
 export default function PanelCard() {
   const { permissions } = usePermissions();
+  const { user, setNoti } = useAuthContext();
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -23,6 +26,7 @@ export default function PanelCard() {
   const [key, setKey] = useState(0);
   const cardsPerPage = 6;
   const routeImage = process.env.IMAGES_ROUTE_URL;
+  const specialLink = process.env.NEXT_PUBLIC_EDCORE_DOCENTES;
 
   const accessibleCards = permissions.map((permission) => ({
     id: permission.idAplicacion.toString(),
@@ -30,11 +34,32 @@ export default function PanelCard() {
     title: permission.aplicacionClave.toUpperCase(),
     link: permission.link,
   }));
-
   const totalPages = Math.ceil(accessibleCards.length / cardsPerPage);
 
-  const handleNavigation = (link: string) => {
-    router.push(link);
+  const handleNavigation = async (link: string) => {
+    if (link === specialLink) {
+      try {
+        const correo = user?.correo;
+        if (!correo) {
+          return;
+        }
+
+        const key2 = md5(correo);
+        await fetch(`${specialLink}?key=${key2}`, {
+          method: 'GET',
+        });
+
+        router.push(`${link}?key=${key2}`);
+      } catch (error) {
+        setNoti({
+          open: true,
+          type: 'error',
+          message: 'Error al cargar los datos.',
+        });
+      }
+    } else {
+      router.push(link);
+    }
   };
 
   const triggerAnimation = (newDirection: 'left' | 'right') => {
