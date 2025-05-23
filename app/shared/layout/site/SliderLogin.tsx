@@ -87,7 +87,7 @@ export default function SliderLogin({ active, onChange }: SliderLoginProps) {
           },
         }}
       >
-        Registrate
+        Regístrate
       </Button>
     </Box>
   );

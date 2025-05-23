@@ -4,7 +4,11 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { Groups2 } from '@mui/icons-material';
 import {
-  GraphBarAll, LineChartPeriods, IndicatorCard, IndicatorCardEstatus,
+  GraphBarAll,
+  LineChartPeriods,
+  IndicatorCard,
+  IndicatorCardEstatus,
+  IndicatorCardModalidad,
 } from '@/app/shared/common';
 // import { MapaJalisco } from '@/src/app/shared/common';
 // import topojal from '../../../jal_topojson.json';
@@ -99,7 +103,7 @@ function GeneroIndicator({ generoData, captacionTotal } : {
   generoData: GeneroData[], captacionTotal: number }) {
   return (
     <IndicatorCard
-      title='Genero'
+      title='Género'
       items={mapDataToItems(generoData, 'genero')}
       layout='horizontal'
       total={captacionTotal}
@@ -107,13 +111,18 @@ function GeneroIndicator({ generoData, captacionTotal } : {
   );
 }
 
-function ModalidadIndicator({ modalidadData, captacionTotal }:{
+function ModalidadIndicator({ modalidadData, captacionTotal }: {
   modalidadData: ModalidadData[], captacionTotal: number }) {
+  const items = modalidadData.map((item) => ({
+    label: item.modalidad,
+    value: item.cantidad,
+    icon: getIcon(item.modalidad, 'modalidad'),
+  }));
+
   return (
-    <IndicatorCard
+    <IndicatorCardModalidad
       title='Modalidad'
-      items={mapDataToItems(modalidadData, 'modalidad')}
-      layout='horizontal'
+      items={items}
       total={captacionTotal}
     />
   );

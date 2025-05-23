@@ -1,5 +1,10 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import Link from 'next/link';
 import CardTemplateClient from './CardTemplateClient';
 
@@ -32,23 +37,37 @@ function IndicatorCard({
   link,
   total,
 }: IndicatorCardProps) {
-  const isGenero = title.toLowerCase() === 'genero';
+  const isGenero = title.toLowerCase() === 'genero' || title.toLowerCase() === 'género';
   const isModalidad = title.toLowerCase() === 'modalidad';
   const isVertical = layout === 'vertical';
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Ajustar el número de columnas dinámicamente para Modalidad
   // eslint-disable-next-line no-nested-ternary
   const columns = isGenero
     ? 'repeat(4, 1fr)'
+    // eslint-disable-next-line no-nested-ternary
     : isModalidad
-      ? `repeat(${items.length * 2}, 1fr)`
+      ? isSmallScreen
+        ? `repeat(${items.length * 2}, 1fr)`
+        : 'repeat(2, 1fr)'
       : 'repeat(2, 1fr)';
 
   const cardContent = (
     <CardTemplateClient
       title={title}
       description={(
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            flex: 1,
+            ...(isGenero && { mt: 4 }),
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -111,19 +130,23 @@ function IndicatorCard({
                 >
                   {items.map((item) => (
                     <React.Fragment key={item.label}>
-                      {/* Ícono */}
                       <Box
                         sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          color: colors.iconColor || '#308fff',
                         }}
                       >
-                        {item.icon}
+                        {React.isValidElement(item.icon) && isGenero
+                          ? React.cloneElement(item.icon as React.ReactElement, {
+                            sx: {
+                              ...(item.icon.props?.sx || {}),
+                              fontSize: '2.5rem',
+                            },
+                          })
+                          : item.icon}
                       </Box>
 
-                      {/* Valor */}
                       <Box
                         sx={{
                           display: 'flex',
@@ -136,7 +159,7 @@ function IndicatorCard({
                           sx={{
                             color: colors.valueColor || 'text.primary',
                             fontWeight: 'bold',
-                            fontSize: '1.2rem',
+                            fontSize: isGenero ? '1.5rem' : '1.2rem',
                           }}
                         >
                           {new Intl.NumberFormat('es-MX').format(Number(item.value))}
@@ -147,6 +170,7 @@ function IndicatorCard({
                             sx={{
                               color: colors.valueColor || 'text.primary',
                               fontWeight: 'bold',
+                              fontSize: isGenero ? '1.2rem' : '0.875rem',
                             }}
                           >
                             {new Intl.NumberFormat('es-MX', { style: 'percent' })
@@ -155,6 +179,7 @@ function IndicatorCard({
                         )}
                       </Box>
                     </React.Fragment>
+
                   ))}
                 </Box>
               )}
