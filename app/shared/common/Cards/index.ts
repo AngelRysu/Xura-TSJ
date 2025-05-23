@@ -8,3 +8,5 @@ export { default as IndicatorCard } from './IndicatorCard';
 export { default as PanelIndicadoresCard } from './PanelIndicadoresCard';
 export { default as CardTemplateClient } from './CardTemplateClient';
 export { default as IndicatorCardEstatus } from './IndicatorCardEstatus';
+export { default as IndicatorCardModalidad } from './IndicatorCardModalidad';
+export { default as UnitsCard } from './UnitsCard';

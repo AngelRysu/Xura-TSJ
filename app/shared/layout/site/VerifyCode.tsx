@@ -24,6 +24,15 @@ const generateUniqueId = (index: number) => `input-code-${index}-${Date.now()}`;
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 const domain = process.env.NEXT_PUBLIC_URL;
 
+function maskEmail(email: string): string {
+  const [localPart, dominio] = email.split('@');
+  if (!localPart || !dominio) return email;
+
+  const visibleChars = localPart.slice(0, 2);
+  const maskedPart = '*'.repeat(Math.max(localPart.length - 2, 0));
+  return `${visibleChars}${maskedPart}@${dominio}`;
+}
+
 export default function VerifyCode({
   type,
   email = '',
@@ -45,7 +54,13 @@ export default function VerifyCode({
   const [altSendUsed, setAltSendUsed] = useState(false);
   const [isSetPasswordMode, setIsSetPasswordMode] = useState(false);
 
-  const currentData = isEmailStep ? email : celular;
+  let currentData = '';
+
+  if (isEmailStep && email) {
+    currentData = maskEmail(email);
+  } else if (celular) {
+    currentData = `${celular.slice(0, 3)}******${celular.slice(-2)}`;
+  }
   const messageTypeMap = {
     Auth: 'Autenticación',
     Register: 'Validación',

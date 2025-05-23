@@ -5,7 +5,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Groups2 } from '@mui/icons-material';
 import {
-  GraphBarAll, LineChartPeriods, IndicatorCard, IndicatorCardEstatus,
+  GraphBarAll,
+  LineChartPeriods,
+  IndicatorCard,
+  IndicatorCardEstatus,
+  IndicatorCardModalidad,
 } from '@/app/shared/common';
 import { TableUnidades } from '@/app/components/dashboard';
 import { madaniArabicBold } from '@/public/assets/fonts';
@@ -54,7 +58,7 @@ function MatriculaIndicator({ estudiantes }:{ estudiantes: string }) {
 function GeneroIndicator({ generoData, total } : { generoData: GeneroData[], total: number }) {
   return (
     <IndicatorCard
-      title='Genero'
+      title='Género'
       items={mapDataToItems(generoData, 'genero')}
       layout='horizontal'
       total={total}
@@ -62,13 +66,18 @@ function GeneroIndicator({ generoData, total } : { generoData: GeneroData[], tot
   );
 }
 
-function ModalidadIndicator({ modalidadData, total } :
-  { modalidadData: ModalidadData[], total: number }) {
+function ModalidadIndicator({ modalidadData, total }: {
+  modalidadData: ModalidadData[], total: number }) {
+  const items = modalidadData.map((item) => ({
+    label: item.modalidad,
+    value: item.cantidad,
+    icon: getIcon(item.modalidad, 'modalidad'),
+  }));
+
   return (
-    <IndicatorCard
+    <IndicatorCardModalidad
       title='Modalidad'
-      items={mapDataToItems(modalidadData, 'modalidad')}
-      layout='horizontal'
+      items={items}
       total={total}
     />
   );

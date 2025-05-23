@@ -11,6 +11,8 @@ export default function getMuiIcon(iconName: string): ReactElement {
     VpnKeyOutlinedIcon: 'VpnKeyOutlined',
     AssessmentOutlinedIcon: 'AssessmentOutlined',
     HelpOutlineIcon: 'HelpOutline',
+    HowToRegOutlinedIcon: 'HowToRegOutlined',
+    SchoolOutlinedIcon: 'SchoolOutlined',
   };
 
   const iconComponent = iconsMap[iconName] || 'HelpOutline';

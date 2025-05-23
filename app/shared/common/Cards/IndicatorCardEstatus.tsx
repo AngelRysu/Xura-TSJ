@@ -60,14 +60,13 @@ function IndicatorCardEstatus({
     [correctedItems],
   );
 
-  function renderGroup(groupTitle: string, group: {
+  function renderGroup(group: {
     label: string; value: number | string; icon?: React.ReactNode
   }[]) {
+    if (group.length === 0) return null;
+
     return (
       <>
-        <Typography variant='body2' sx={{ textAlign: 'left' }}>
-          {groupTitle}
-        </Typography>
         {group.map((item) => (
           <Box
             key={item.label}
@@ -123,12 +122,12 @@ function IndicatorCardEstatus({
         }}
         >
           {type !== '' ? (
-            renderGroup('', groups.grupo4)
+            renderGroup(groups.grupo4)
           ) : (
             <>
-              {renderGroup('Inscripción', groups.grupo1)}
-              {renderGroup('Examen', groups.grupo2)}
-              {renderGroup('Registros', groups.grupo3)}
+              {groups.grupo1.length > 0 && renderGroup(groups.grupo1)}
+              {groups.grupo2.length > 0 && renderGroup(groups.grupo2)}
+              {groups.grupo3.length > 0 && renderGroup(groups.grupo3)}
             </>
           )}
         </Box>
