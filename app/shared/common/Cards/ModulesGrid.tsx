@@ -11,14 +11,18 @@ import {
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePermissions } from '@/app/context/PermissionsContext';
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useAuthContext } from '@/app/context/AuthContext';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { getData } from '@/app/shared/utils/apiUtils';
 
 export default function ModulesGrid() {
   const { permissions } = usePermissions();
+  const { user, setNoti } = useAuthContext();
   const pathname = usePathname();
+  const router = useRouter();
+  const [grupos, setGrupos] = useState<any[]>([]);
 
   const currentPermission = permissions.find(
     (permission) => permission.link === pathname,
@@ -39,6 +43,52 @@ export default function ModulesGrid() {
   const cardsPerPage = 6;
   const routeImage = process.env.IMAGES_ROUTE_URL;
   const totalPages = Math.ceil(accessibleModules.length / cardsPerPage);
+
+  const gruposUsuario = useMemo(() => user?.grupos?.split(',') || [], [user]);
+
+  useEffect(() => {
+    if (!pathname.startsWith('/data')) return;
+
+    const fetchGrupos = async () => {
+      try {
+        const { data } = await getData({ endpoint: '/grupos' });
+        setGrupos(data);
+      } catch (error) {
+        setNoti({
+          open: true,
+          type: 'error',
+          message: 'Error al cargar los grupos.',
+        });
+      }
+    };
+
+    fetchGrupos();
+  }, [pathname, setNoti]);
+
+  const handleModuleClick = async (link: string) => {
+    if (link === '/data/matricula') {
+      if (gruposUsuario.includes('1')) {
+        router.push('/data/matricula');
+        return;
+      }
+
+      const gruposDelUsuario = grupos.filter((grupo) => gruposUsuario
+        .includes(grupo.idGrupo.toString()));
+
+      if (gruposDelUsuario.length === 1) {
+        const grupoUnico = gruposDelUsuario[0];
+        const claveBase = grupoUnico.clave?.split('_')[0];
+        const tieneExtensiones = grupos.some((g) => g.clave?.startsWith(`${claveBase}_EX`));
+
+        if (!tieneExtensiones) {
+          const nombreRuta = encodeURIComponent(grupoUnico.nombre.toUpperCase());
+          router.push(`/data/matricula/unidad/${nombreRuta}`);
+          return;
+        }
+      }
+    }
+    router.push(link);
+  };
 
   const triggerAnimation = (newDirection: 'left' | 'right') => {
     setSlideDirection(newDirection);
@@ -150,56 +200,55 @@ export default function ModulesGrid() {
           const { xs, sm, md } = getGridProps(currentModules.length);
           return (
             <Grid item key={module.id} xs={xs} sm={sm} md={md}>
-              <Link href={module.link} style={{ textDecoration: 'none' }}>
-                <Card
-                  elevation={3}
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
-                    },
-                    overflow: 'hidden',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 3,
-                  }}
-                >
-                  {module.img !== `${routeImage}/null` ? (
-                    <Image
-                      src={module.img}
-                      alt={module.title}
-                      width={300}
-                      height={200}
-                      priority
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                    />
-                  ) : (
-                    <CardContent
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                        height: '100%',
-                      }}
-                    >
-                      <Typography variant='h6' sx={{ fontWeight: '500' }}>
-                        {module.title}
-                      </Typography>
-                    </CardContent>
-                  )}
-                </Card>
-              </Link>
+              <Card
+                elevation={3}
+                onClick={() => handleModuleClick(module.link)}
+                sx={{
+                  cursor: 'pointer',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+                  },
+                  overflow: 'hidden',
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 3,
+                }}
+              >
+                {module.img !== `${routeImage}/null` ? (
+                  <Image
+                    src={module.img}
+                    alt={module.title}
+                    width={300}
+                    height={200}
+                    priority
+                    style={{
+                      objectFit: 'cover',
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  />
+                ) : (
+                  <CardContent
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      height: '100%',
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '500' }}>
+                      {module.title}
+                    </Typography>
+                  </CardContent>
+                )}
+              </Card>
             </Grid>
           );
         })}
