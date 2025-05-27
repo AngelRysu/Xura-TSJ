@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Groups2 } from '@mui/icons-material';
 import {
@@ -9,11 +9,15 @@ import {
   LineChartPeriods,
   IndicatorCardEstatus,
   IndicatorCardModalidad,
+  UnitsCard,
 } from '@/app/shared/common';
 import { TableUnidades } from '@/app/components/dashboard';
 import { madaniArabicBold } from '@/public/assets/fonts';
 import { fetchData, fetchString } from '@/app/services/api';
 import { capitalizeWords, getIcon } from '@/app/shared/common/Util/iconsFormat';
+import { useAuthContext } from '@/app/context/AuthContext';
+import { getData } from '@/app/shared/utils/apiUtils';
+import { useRouter } from 'next/navigation';
 
 interface GeneroData {
   genero: string;
@@ -107,6 +111,11 @@ export default function DashboardPage() {
   const [claseE, setClaseE] = useState<any[]>([]);
   const [claseN, setClaseN] = useState<any[]>([]);
   const [matriculaVariacion, setVariacionData] = useState<any[]>([]);
+  const { user, setNoti } = useAuthContext();
+  const router = useRouter();
+  const gruposUsuario = useMemo(() => user?.grupos?.split(',') || [], [user]);
+  const [grupos, setGrupos] = useState<any[]>([]);
+  const [mostrarUnitsCard, setMostrarUnitsCard] = useState(false);
 
   useEffect(() => {
     async function fetchDataFromAPI() {
@@ -160,6 +169,48 @@ export default function DashboardPage() {
     max: Math.max(...estPeriodos.map((item) => item.estudiantes)),
     min: Math.min(...estPeriodos.map((item) => item.estudiantes)),
   };
+
+  useEffect(() => {
+    const fetchGrupos = async () => {
+      try {
+        const { data } = await getData({ endpoint: '/grupos' });
+        setGrupos(data);
+
+        const gruposDelUsuario = data.filter((g: any) => gruposUsuario
+          .includes(g.idGrupo.toString()));
+
+        if (gruposUsuario.includes('1')) return;
+
+        if (gruposDelUsuario.length === 1) {
+          const grupo = gruposDelUsuario[0];
+          const claveBase = grupo.clave?.split('_')[0];
+
+          const tieneExtensiones = data.some((g: any) => g.clave?.startsWith(`${claveBase}_EX`));
+
+          if (!tieneExtensiones) {
+            const nombreRuta = encodeURIComponent(grupo.nombre.toUpperCase());
+            router.push(`/data/matricula/unidad/${nombreRuta}`);
+            return;
+          }
+        }
+        setMostrarUnitsCard(true);
+      } catch (error) {
+        setNoti({
+          open: true,
+          type: 'error',
+          message: 'Error al cargar grupos',
+        });
+      }
+    };
+
+    fetchGrupos();
+  }, [user, gruposUsuario, router, setNoti]);
+
+  if (mostrarUnitsCard) {
+    return (
+      <UnitsCard grupos={grupos} gruposUsuario={gruposUsuario} />
+    );
+  }
 
   return (
     <Box

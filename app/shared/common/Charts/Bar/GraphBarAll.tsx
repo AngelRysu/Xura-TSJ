@@ -22,7 +22,7 @@ interface GraphBarAllProps {
   // eslint-disable-next-line no-unused-vars
   onBarClick?: (clave: string) => void;
   dataType: 'unidad' | 'captacion' | 'carrera';
-  unidad?:'';
+  unidad?: string;
 }
 
 export default function GraphBarAll({
