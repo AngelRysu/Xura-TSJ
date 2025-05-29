@@ -86,8 +86,11 @@ export default function GraphBarAll({
     } else if (dataType === 'unidad') {
       router.push(`matricula/unidad/${clave}`);
     } else if (dataType === 'carrera') {
-      router.push(`/matricula/unidad/${unidad}/carrera/${clave}`);
-    } /* else {
+      // router.push(`/matricula/unidad/${unidad}/carrera/${clave}`);
+      // eslint-disable-next-line no-console
+      console.log(unidad);
+    }
+    /* else {
       router.push(`captacion/detalle/${clave}`);
     } */
   };

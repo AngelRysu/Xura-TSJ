@@ -239,6 +239,12 @@ export default function DashboardPage() {
         >
           {`Matrícula ${periodo}`}
         </Typography>
+        <Typography
+          variant='h5'
+          sx={{ whiteSpace: 'nowrap', maxWidth: { xs: '100%', md: '60%' } }}
+        >
+          Fecha de corte: 04 Marzo 2025 registrado en el TECNM
+        </Typography>
       </Box>
       <Box
         sx={{

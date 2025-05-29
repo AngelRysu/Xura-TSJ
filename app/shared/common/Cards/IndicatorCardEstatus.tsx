@@ -3,6 +3,13 @@ import {
   Box, Typography, SxProps, Theme,
 } from '@mui/material';
 import Link from 'next/link';
+import {
+  AssignmentTurnedIn,
+  Payment,
+  School,
+  Cancel,
+  HelpOutline,
+} from '@mui/icons-material';
 import CardTemplateClient from './CardTemplateClient';
 
 interface IndicatorCardEStatusProps {
@@ -35,10 +42,28 @@ function IndicatorCardEstatus({
       'Registrado Sin Validar': 'Registro No Validado',
       'Registrado Validado': 'Registro Validado',
     };
-    return items.map((item) => ({
-      ...item,
-      label: mapping[item.label] || item.label,
-    }));
+
+    const iconMap: Record<string, React.ReactNode> = {
+      Inscrito: <AssignmentTurnedIn sx={{ color: '#4caf50' }} />,
+      'Inscripción Pagada': <Payment sx={{ color: '#03a9f4' }} />,
+      'Examen Aplicado': <School sx={{ color: '#08d7ff' }} />,
+      'Examen Pagado': <Payment sx={{ color: '#4caf50' }} />,
+      'Registro Validado': <AssignmentTurnedIn sx={{ color: '#03a9f4' }} />,
+      'Registro No Validado': <HelpOutline sx={{ color: '#ff9800' }} />,
+      Vigente: <AssignmentTurnedIn sx={{ color: '#4caf50' }} />,
+      'Cursos Especiales': <School sx={{ color: '#3f51b5' }} />,
+      'Baja Definitiva': <Cancel sx={{ color: '#f44336' }} />,
+      'Baja Temporal': <Cancel sx={{ color: '#ff5722' }} />,
+    };
+
+    return items.map((item) => {
+      const correctedLabel = mapping[item.label] || item.label;
+      return {
+        ...item,
+        label: correctedLabel,
+        icon: item.icon || iconMap[correctedLabel],
+      };
+    });
   }, [items]);
 
   const groups = useMemo(
